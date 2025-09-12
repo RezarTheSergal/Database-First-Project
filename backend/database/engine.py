@@ -7,7 +7,7 @@ class DBSession:
 
     @classmethod
     def init(self, db_url):
-        self._engine = create_engine(db_url)
+        self._engine = create_engine(db_url, echo=True, future=True)
         self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
     @classmethod

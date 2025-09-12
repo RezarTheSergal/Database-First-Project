@@ -4,7 +4,7 @@ import sys
 from backend.database.engine import DBSession
 from backend.settings import PgConfig
 
-DBSession.init(PgConfig().database_url)
+DBSession.init(PgConfig().database_url())
 
 def main():
     app = QApplication(sys.argv)

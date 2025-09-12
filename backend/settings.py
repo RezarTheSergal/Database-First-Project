@@ -8,16 +8,16 @@ load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default=True)
-HOST = env.str('DB_HOST', default='localhost')
-PORT = env.str('DB_PORT', default='5432')
-USER = env.str('DB_USER', default='postgres')
-NAME = env.str('DB_NAME', default='university')
-PASSWORD = env.str('DB_PASSWORD')
+HOST = os.getenv('DB_HOST', default='localhost')
+PORT = os.getenv('DB_PORT', default='5432')
+USER = os.getenv('DB_USER', default='postgres')
+NAME = os.getenv('DB_NAME', default='university')
+PASSWORD = os.getenv('DB_PASSWORD')
 
 @dataclass
 class PgBase:
     host: str = HOST
-    port: int = PORT
+    port: int = int(PORT)
     dbname: str = NAME
     user: str = USER
     password: str = PASSWORD
