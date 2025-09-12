@@ -1,6 +1,22 @@
-# Database-First-Project
-Desktop Приложения для управлении БД на python
+Десктопное-приложение для взаимодействия с БД
 
-Для запуска проекта юзаем важную штуку:
+## Участники
+- Валекжанин Владимир - Frontend Developer
+- Амвросов Максим - Frontend Developer
+- Шаломеенко Анастасия - QA Engineer
+- Ляпунов Даниил - Data Scientist
+- Кочегаров Михаил - Backend Developer
 
-`pip install -r requirements.txt`
+## Стек
+- Язык: Python
+- GUI: PySide6
+- БД: PostgreSQL + SQLAlchemy
+- Юнит-тестирование: pytest
+
+## Локальный запуск
+
+В корне проекта:
+
+```bash
+pip install -r requirements.txt
+```
