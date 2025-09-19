@@ -2,8 +2,10 @@ import sys
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from backend.settings import PgConfig
+from backend.database.init_db import init_database
 
 if __name__ == "__main__":
+  init_database()
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     engine.addImportPath(sys.path[0])
