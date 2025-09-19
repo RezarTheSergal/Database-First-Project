@@ -27,6 +27,15 @@ source venv/bin/activate # Linux
 pip install -r requirements.txt
 ```
 
+>[!warning] Если у вас не находится python-dotenv, можно попробовать несколько вещей:
+- Удалить `dotenv` и `python-dotenv`, переустановить зависимости из `requirements.txt`;
+- Удалить `dotenv` из вашего основного питона в системе (то есть не в виртуальном окружении);
+- Выставить в `venv/pyvenv.cfg`: `include-system-site-packages = true` (по умолчанию `false`);
+
+### Q&A
+
+- Чтобы выйти из venv, пропишите в консоли `deactivate`;
+
 ## Работа с БД
 
 Для упрощённой работы с БД используется библиотека [alembic](https://rutube.ru/video/fa453d4fa9b31e028cc4db5786d091b8/?r=wd&p=EAFBAIUOor1oyyQIlfX1Qw)
