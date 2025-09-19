@@ -3,7 +3,6 @@
 Содержит функцию для полной настройки БД
 """
 
-import os
 import sys
 from pathlib import Path
 from sqlalchemy import create_engine, text
@@ -11,28 +10,23 @@ from sqlalchemy import create_engine, text
 # Добавляем путь для импортов
 sys.path.append(str(Path(__file__).parent.parent))
 
-from .database import get_engine
+from .database import Database
 from .models import Base
 from backend.settings import PgConfig
+
+db_engine = Database().get_engine()
 
 def create_database_if_not_exists():
     """Создает базу данных, если она не существует"""
     try:
         pg_config = PgConfig()
         
-        # Получаем параметры подключения к серверу PostgreSQL
-        db_url = pg_config.database_url()
-        base_url = '/'.join(db_url.split('/')[:-1]) + '/postgres'
-        
-        # Создаем engine с autocommit для создания БД
-        engine = create_engine(base_url, isolation_level="AUTOCOMMIT")
-        
         # Используем правильные атрибуты из PgConfig
         db_name = pg_config.dbname 
         db_user = pg_config.user  
         
         # Проверяем существование базы данных
-        with engine.connect() as conn:
+        with db_engine.connect() as conn:
             result = conn.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'"))
             exists = result.scalar()
             
@@ -56,12 +50,11 @@ def create_database_if_not_exists():
 def create_tables():
     """Создает все таблицы в базе данных"""
     try:
-        engine = get_engine()
-        Base.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=db_engine)
         print("Все таблицы успешно созданы")
         
         # Выводим список созданных таблиц
-        with engine.connect() as conn:
+        with db_engine.connect() as conn:
             result = conn.execute(text("""
                 SELECT table_name 
                 FROM information_schema.tables 

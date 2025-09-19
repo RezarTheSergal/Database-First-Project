@@ -2,8 +2,10 @@ import subprocess
 import os
 from sqlalchemy import create_engine, text
 from backend.database.models import Base
-from backend.database.database import get_engine
+from backend.database.database import Database
 from backend.settings import PgConfig
+
+db_engine = Database().get_engine()
 
 class SchemaCreator:
     """
@@ -82,7 +84,7 @@ class SchemaCreator:
         """
         try:
             print("Создание схемы базы данных напрямую...")
-            engine = get_engine()
+            engine = db_engine
             Base.metadata.create_all(bind=engine)
             print("Таблицы базы данных созданы успешно!")
             return {"status": "success", "message": "Схема создана напрямую"}
@@ -91,7 +93,6 @@ class SchemaCreator:
             return {"status": "error", "message": str(e)}
     
     @staticmethod
-
     def init_db():
         """
         Инициализация базы данных - сначала пробует Alembic, затем прямое создание

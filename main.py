@@ -8,9 +8,17 @@ STYLESHEET_PATH = os.getcwd() + "/frontend/ui/styles/style.css"
 
 
 if __name__ == "__main__":
-    app = Qw.QApplication(styleSheet=STYLESHEET_PATH)
-    settings = Qc.QSettings()
+    init_database()
+    engine = QQmlApplicationEngine()
+    engine.addImportPath(sys.path[0])
 
+    app = Qw.QApplication(sys.argv, styleSheet=STYLESHEET_PATH)
+    settings = Qc.QSettings()
     main_window = MainWindow()
 
-    sys.exit(app.exec())
+    if not engine.rootObjects():
+        sys.exit(-1)
+    exit_code = app.exec()
+    del engine
+
+    sys.exit(exit_code)
