@@ -18,6 +18,12 @@
 В корне проекта:
 
 ```bash
+python -m venv venv
+
+source venv/Scripts/activate # Windows
+# ИЛИ
+source venv/bin/activate # Linux
+
 pip install -r requirements.txt
 ```
 

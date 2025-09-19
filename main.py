@@ -1,16 +1,17 @@
-from frontend.base import MainWindow
-from PySide6.QtWidgets import QApplication
 import sys
-from backend.database.database import Database
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtQml import QQmlApplicationEngine
 from backend.settings import PgConfig
 from backend.database.init_db import init_database
-def main():
-    init_database()
-    app = QApplication(sys.argv)
-    win = MainWindow()
-    win.show()
-    sys.exit(app.exec())
 
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+  init_database()
+    app = QGuiApplication(sys.argv)
+    engine = QQmlApplicationEngine()
+    engine.addImportPath(sys.path[0])
+    engine.loadFromModule("frontend/ui/Main", "Main")
+    if not engine.rootObjects():
+        sys.exit(-1)
+    exit_code = app.exec()
+    del engine
+    sys.exit(exit_code)
