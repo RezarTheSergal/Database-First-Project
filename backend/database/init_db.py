@@ -21,19 +21,12 @@ def create_database_if_not_exists():
     try:
         pg_config = PgConfig()
         
-        # Получаем параметры подключения к серверу PostgreSQL
-        db_url = pg_config.database_url()
-        base_url = '/'.join(db_url.split('/')[:-1]) + '/postgres'
-        
-        # Создаем engine с autocommit для создания БД
-        engine = create_engine(base_url, isolation_level="AUTOCOMMIT")
-        
         # Используем правильные атрибуты из PgConfig
         db_name = pg_config.dbname 
         db_user = pg_config.user  
         
         # Проверяем существование базы данных
-        with engine.connect() as conn:
+        with db_engine.connect() as conn:
             result = conn.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'"))
             exists = result.scalar()
             
