@@ -4,7 +4,6 @@ from .components import PushButton, Text, Icon, Font, VLayout, Alignment
 
 
 class MainWindow(Qw.QMainWindow):
-
     def __init__(self):
         super().__init__()
 
