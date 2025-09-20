@@ -4,82 +4,83 @@
 """
 
 import sys
+import logging
 from pathlib import Path
 from sqlalchemy import create_engine, text
-
+from backend.utils.exception_handler import ExceptionHandler
 # Добавляем путь для импортов
 sys.path.append(str(Path(__file__).parent.parent))
 
 from .database import Database
 from .models import Base
 from backend.settings import PgConfig
+import logging
 
 db_engine = Database().get_engine()
+logger = logging.getLogger()
 
+@ExceptionHandler()
 def create_database_if_not_exists():
     """Создает базу данных, если она не существует"""
-    try:
-        pg_config = PgConfig()
-        
-        # Используем правильные атрибуты из PgConfig
-        db_name = pg_config.dbname 
-        db_user = pg_config.user  
-        
-        # Проверяем существование базы данных
-        with db_engine.connect() as conn:
-            result = conn.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'"))
-            exists = result.scalar()
-            
-            if not exists:
-                print(f"Создание базы данных '{db_name}'...")
-                conn.execute(text(f"CREATE DATABASE {db_name}"))
-                print(f"База данных '{db_name}' успешно создана")
-                
-                # Даем права пользователю
-                conn.execute(text(f"GRANT ALL PRIVILEGES ON DATABASE {db_name} TO {db_user}"))
-                print(f"Права доступа предоставлены пользователю '{db_user}'")
-            else:
-                print(f"База данных '{db_name}' уже существует")
-                
-        return True
-        
-    except Exception as e:
-        print(f"Ошибка при создании базы данных: {e}")
-        return False
 
+    pg_config = PgConfig()
+        
+    # Используем правильные атрибуты из PgConfig
+    db_name = pg_config.dbname 
+    db_user = pg_config.user  
+    creational_url = f"postgresql+psycopg2://{db_user}:{pg_config.password}@{pg_config.host}:{pg_config.port}/postgres"
+    creational_engine = create_engine(creational_url, isolation_level='AUTOCOMMIT')
+
+    # Проверяем существование базы данных
+    with creational_engine.connect() as conn:
+        result = conn.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'"))
+        exists = result.scalar()
+            
+        if not exists:
+            logger.info(f"Создание базы данных '{db_name}'...")
+            conn.execute(text(f"CREATE DATABASE {db_name}"))
+            logger.info(f"База данных '{db_name}' успешно создана")
+                
+            # Даем права пользователю
+            conn.execute(text(f"GRANT ALL PRIVILEGES ON DATABASE {db_name} TO {db_user}"))
+            logger.info(f"Права доступа предоставлены пользователю '{db_user}'")
+        else:
+            logger.info(f"База данных '{db_name}' уже существует")
+                
+    return True
+
+    
+
+@ExceptionHandler()
 def create_tables():
     """Создает все таблицы в базе данных"""
-    try:
-        Base.metadata.create_all(bind=db_engine)
-        print("Все таблицы успешно созданы")
+    Base.metadata.create_all(bind=db_engine)
+    logger.info("Все таблицы успешно созданы!")
         
-        # Выводим список созданных таблиц
-        with db_engine.connect() as conn:
-            result = conn.execute(text("""
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-                ORDER BY table_name
-            """))
+    # Выводим список созданных таблиц
+    with db_engine.connect() as conn:
+        result = conn.execute(text("""
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+            ORDER BY table_name
+        """))
             
-            tables = result.fetchall()
-            if tables:
-                print("Список созданных таблиц:")
-                for table in tables:
-                    print(f"   - {table[0]}")
+        tables = result.fetchall()
+        if tables:
+            logging.info("Список созданных таблиц:")
+            for table in tables:
+                print(f"   - {table[0]}")
                     
-        return True
-    except Exception as e:
-        print(f"Ошибка при создании таблиц: {e}")
-        return False
-
+    
+@ExceptionHandler()
 def init_database():
     """
     Основная функция инициализации базы данных
     Создает БД (если не существует) и все таблицы
     Возвращает True при успехе, False при ошибке
     """
-    print("Инициализация базы данных...")
+    logging.info("Инициализация базы данных...")
     
     # Создаем базу данных, если не существует
     if not create_database_if_not_exists():
@@ -89,5 +90,5 @@ def init_database():
     if not create_tables():
         return False
     
-    print("База данных успешно инициализирована!")
+    logger.info("База данных успешно инициализирована!")
     return True

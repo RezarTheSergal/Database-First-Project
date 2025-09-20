@@ -1,17 +1,7 @@
-import sys
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtQml import QQmlApplicationEngine
-from backend.settings import PgConfig
+import logging
 from backend.database.init_db import init_database
-
+from backend.utils.logger import setup_logging
+from backend.settings import LOG_FILE_PATH
 if __name__ == "__main__":
-  init_database()
-    app = QGuiApplication(sys.argv)
-    engine = QQmlApplicationEngine()
-    engine.addImportPath(sys.path[0])
-    engine.loadFromModule("frontend/ui/Main", "Main")
-    if not engine.rootObjects():
-        sys.exit(-1)
-    exit_code = app.exec()
-    del engine
-    sys.exit(exit_code)
+    setup_logging(level=logging.INFO, log_file=LOG_FILE_PATH, console_log=True) # Не убирать отсюда, всё логгирование держится на этом!
+    init_database()

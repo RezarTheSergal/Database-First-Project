@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from backend.database.models import Base
 from backend.database.database import Database
 from backend.settings import PgConfig
+from backend.utils.exception_handler import ExceptionHandler
 
 db_engine = Database().get_engine()
 
@@ -12,6 +13,7 @@ class SchemaCreator:
     Класс для создания схемы базы данных с поддержкой Alembic
     """
     @staticmethod
+    @ExceptionHandler()
     def create_database():
         """
         Создать саму базу данных, если она не существует
@@ -50,6 +52,7 @@ class SchemaCreator:
             return {"status": "error", "message": f"Ошибка создания базы данных: {str(e)}"}
     
     @staticmethod
+    @ExceptionHandler()
     def create_schema_with_alembic():
         """
         Создать схему базы данных с использованием миграций Alembic
@@ -78,6 +81,7 @@ class SchemaCreator:
             return {"status": "error", "message": str(e)}
     
     @staticmethod
+    @ExceptionHandler()
     def create_schema_direct():
         """
         Создать схему базы данных напрямую (резервный метод)
@@ -93,6 +97,7 @@ class SchemaCreator:
             return {"status": "error", "message": str(e)}
     
     @staticmethod
+    @ExceptionHandler()
     def init_db():
         """
         Инициализация базы данных - сначала пробует Alembic, затем прямое создание
@@ -108,6 +113,7 @@ class SchemaCreator:
         return SchemaCreator.create_schema_direct()
     
     @staticmethod
+    @ExceptionHandler()
     def create_initial_migration():
         """
         Создать начальную миграцию Alembic
