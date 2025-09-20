@@ -8,6 +8,13 @@ load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default=True)
+
+# Logging file setup
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE_PATH = os.path.join(BASE_DIR, 'logs', 'latest.log')
+Path(LOG_FILE_PATH).parent.mkdir(exist_ok=True, parents=True)
+
+# Postgres env setup
 HOST = os.getenv('DB_HOST', default='localhost')
 PORT = os.getenv('DB_PORT', default='5432')
 USER = os.getenv('DB_USER', default='postgres')
