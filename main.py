@@ -3,7 +3,8 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
 from const import STYLESHEET_PATH
 from frontend.ui import MainWindow
-
+from backend.utils.logger import setup_logging
+from backend.settings import LOG_FILE_PATH
 
 def keep_loop_running(app, engine):
     del engine
@@ -18,6 +19,7 @@ def keep_loop_running(app, engine):
 
 
 if __name__ == "__main__":
+    setup_logging(level=logging.INFO, log_file=LOG_FILE_PATH, console_log=True) # Не убирать отсюда, всё логгирование держится на этом!
     app = QApplication(sys.argv, styleSheet=STYLESHEET_PATH)
     engine = QQmlApplicationEngine(app)
 
