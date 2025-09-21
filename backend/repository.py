@@ -1,11 +1,12 @@
 # Содержит функции или классы, которые реализуют все запросы к базе (чтение, запись, обновление, удаление).
 
+from backend.utils.exception_handler import ExceptionHandler
 from database.models import Base
 from database.database import Database
 from sqlalchemy import Tuple, and_, asc, desc, select
 from typing import Dict, List, Optional, Any
 
-
+@ExceptionHandler()
 def get_model_by_tablename(table_name: str) -> Base | None:
     """
     Получение класса таблицы по её имени
@@ -15,7 +16,7 @@ def get_model_by_tablename(table_name: str) -> Base | None:
             return cls.class_
     return None
 
-
+@ExceptionHandler()
 def get_table_columns(table_name: str) -> Dict[str, type]:
     """
     Даёт возможность получать данные о полях в таблице
@@ -27,7 +28,7 @@ def get_table_columns(table_name: str) -> Dict[str, type]:
 
     return result
 
-
+@ExceptionHandler()
 def get_table_data(
         table_name: str, 
         columns_list: Optional[List] = None, 

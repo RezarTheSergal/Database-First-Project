@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from backend.settings import PgConfig
+from backend.utils.exception_handler import ExceptionHandler
 
 
 class Singleton(type):
@@ -20,6 +21,7 @@ class Database(metaclass=Singleton):
         self._engine = self.create_database_engine()
         self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
+    @ExceptionHandler()
     def create_database_engine(self):
         """
         Создание движка SQLAlchemy с использованием настроек PgConfig
@@ -39,6 +41,7 @@ class Database(metaclass=Singleton):
 
 
     @contextmanager
+    @ExceptionHandler()
     def get_db_session(self):
         """
         Контекстный менеджер для сессий базы данных с автоматическим управлением транзакциями
