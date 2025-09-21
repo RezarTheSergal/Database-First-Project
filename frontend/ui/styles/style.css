@@ -4,5 +4,24 @@
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
-  background-color: red !important;
+}
+
+QPushButton {
+  color: #cde4ce;
+  background: #2b2b2b;
+  border: 1px solid #0ffa4a;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+QPushButton:hover {
+  background: #20462a;
+}
+
+QLabel {
+  color: #0ffa4a;
+}
+
+QMainWindow {
+  background-color: black
 }

@@ -1,43 +1,52 @@
-import os
-from PySide6 import QtWidgets as Qw
-from .components import PushButton, Text, Icon, Font, VLayout, Alignment
+from os import getcwd
+from PySide6.QtWidgets import QMainWindow, QWidget
+
+from backend.database.init_db import init_database
+from .components import PushButton, Text, VLayout, Alignment, Font, Modal, Icon
+
+ICON_PATH = getcwd() + "/frontend/ui/images/favicon.ico"
+isDatabaseInitialized: bool = False
 
 
-class MainWindow(Qw.QMainWindow):
-    def __init__(self):
+def setup_database():
+    global isDatabaseInitialized
+
+    if not isDatabaseInitialized:
+        init_database()
+        isDatabaseInitialized = True
+
+
+class MainWindow(QMainWindow):
+    def __init__(self, w=550, h=420):
         super().__init__()
-
-        PATH = os.getcwd()
-        ICON_PATH = PATH + "/frontend/ui/images/icons8-monster-energy-32.ico"
-
-        self.setWindowTitle("Monster Energy Factory")
+        self.setFixedSize(w, h)
         self.setWindowIcon(Icon(ICON_PATH))
-        self.setMinimumSize(600, 450)
-
+        self.setWindowTitle("Monster Energy Factory")
         self._setup_ui()
 
-        self.show()
-
     def _setup_ui(self):
-        widget = Qw.QWidget()
+        add_entry_modal = Modal(icon_path=ICON_PATH, title="Добавление данных")
+        view_table_modal = Modal(icon_path=ICON_PATH, title="Просмотр таблиц")
+
+        widget = QWidget()
         self.setCentralWidget(widget)
 
-        h1_font = Font(36)
-        button_font = Font(12)
-
+        h1_font = Font(36, family="Rubik Wet Paint")
         h1 = Text("Панель админа", h1_font)
-        h1.setMargin(40)
 
         create_scheme_btn = PushButton(
-            "Создать схему и таблицы", button_font, callback=lambda: print("Created")
+            "Создать схему и таблицы",
+            callback=setup_database,
         )
-        add_data_btn = PushButton(
-            "Внести данные", button_font, callback=lambda: print("Added")
+        add_entry_btn = PushButton(
+            "Внести данные",
+            callback=lambda: add_entry_modal.show(),
         )
-        show_data_btn = PushButton(
-            "Показать данные", button_font, callback=lambda: print("Showed")
+        view_table_btn = PushButton(
+            "Показать данные",
+            callback=lambda: view_table_modal.show(),
         )
 
-        vbox = VLayout(children=[h1, create_scheme_btn, add_data_btn, show_data_btn])
+        vbox = VLayout(children=[h1, create_scheme_btn, add_entry_btn, view_table_btn])
         vbox.setAlignment(Alignment.Center.value)
         widget.setLayout(vbox)
