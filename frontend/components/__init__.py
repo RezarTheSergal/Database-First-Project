@@ -8,6 +8,7 @@ from .Gradients import LinearGradient, RadialGradient
 from .Point import Point
 from .Modal import Modal
 from .Size import Size
+from .H1 import H1
 
 __all__ = [
     "PushButton",
@@ -21,4 +22,5 @@ __all__ = [
     "Point",
     "Modal",
     "Size",
+    "H1",
 ]

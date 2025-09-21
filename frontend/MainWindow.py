@@ -2,9 +2,9 @@ from os import getcwd
 from PySide6.QtWidgets import QMainWindow, QWidget
 
 from backend.database.init_db import init_database
-from .components import PushButton, Text, VLayout, Alignment, Font, Modal, Icon
+from .components import PushButton, VLayout, Alignment, Modal, Icon, H1
 
-ICON_PATH = getcwd() + "/frontend/ui/images/favicon.ico"
+ICON_PATH = getcwd() + "/frontend/images/favicon.ico"
 isDatabaseInitialized: bool = False
 
 
@@ -25,14 +25,13 @@ class MainWindow(QMainWindow):
         self._setup_ui()
 
     def _setup_ui(self):
-        add_entry_modal = Modal(icon_path=ICON_PATH, title="Добавление данных")
-        view_table_modal = Modal(icon_path=ICON_PATH, title="Просмотр таблиц")
+        add_entry_modal = Modal(title="Добавление данных")
+        view_table_modal = Modal(title="Просмотр таблиц")
 
         widget = QWidget()
         self.setCentralWidget(widget)
 
-        h1_font = Font(36, family="Rubik Wet Paint")
-        h1 = Text("Панель админа", h1_font)
+        h1 = H1("Панель админа")
 
         create_scheme_btn = PushButton(
             "Создать схему и таблицы",
@@ -50,3 +49,7 @@ class MainWindow(QMainWindow):
         vbox = VLayout(children=[h1, create_scheme_btn, add_entry_btn, view_table_btn])
         vbox.setAlignment(Alignment.Center.value)
         widget.setLayout(vbox)
+
+
+if __name__ == "__main__":
+    print("This is not the main file.")

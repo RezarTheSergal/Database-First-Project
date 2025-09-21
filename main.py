@@ -2,7 +2,7 @@ import sys
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
 from const import STYLESHEET_PATH
-from frontend.ui import MainWindow
+from frontend import MainWindow
 
 
 def keep_loop_running(app, engine):
@@ -17,8 +17,15 @@ def keep_loop_running(app, engine):
     sys.exit(exit_code)
 
 
+def apply_stylesheet(app: QApplication):
+    stylesheet = open(STYLESHEET_PATH, "r").read()
+    app.setStyleSheet(stylesheet)
+
+
 if __name__ == "__main__":
-    app = QApplication(sys.argv, styleSheet=STYLESHEET_PATH)
+    app = QApplication(sys.argv)
+    apply_stylesheet(app)
+
     engine = QQmlApplicationEngine(app)
 
     main_window = MainWindow()

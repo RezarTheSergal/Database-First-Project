@@ -1,4 +1,5 @@
 from PySide6.QtGui import QFont
+from .const import DEFAULT_FONT_FAMILY
 
 
 class Font(QFont):
@@ -10,12 +11,13 @@ class Font(QFont):
         isItalic=False,
         hasKerning=False,
         isUnderlined=False,
-        family="Monsterrat",
+        family=DEFAULT_FONT_FAMILY,
     ):
         super().__init__()
+
         self.setPointSize(point_size_px)
-        self.setFamily(family)
         self.setBold(isBold)
         self.setItalic(isItalic)
         self.setKerning(hasKerning)
         self.setUnderline(isUnderlined)
+        self.setFamily(family)

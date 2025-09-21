@@ -1,5 +1,5 @@
 from PySide6.QtGui import QLinearGradient, QRadialGradient
-from . import Point
+from .Point import Point
 
 
 class LinearGradient(QLinearGradient):
