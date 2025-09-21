@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 load_dotenv(".env")
@@ -12,6 +13,12 @@ DEBUG = os.getenv('DEBUG', default=True)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_PATH = os.path.join(BASE_DIR, 'logs', 'latest.log')
 Path(LOG_FILE_PATH).parent.mkdir(exist_ok=True, parents=True)
+
+# Styles path (frontend)
+STYLESHEET_PATH = (Path(BASE_DIR).parent.resolve() / "frontend" / "ui" / "styles" / "style.css").__str__()
+
+# Icon path (frontend)
+ICON_PATH = (Path(BASE_DIR).parent.resolve() / "frontend" / "ui" / "images" / "favicon.ico").__str__()
 
 # Postgres env setup
 HOST = os.getenv('DB_HOST', default='localhost')

@@ -4,17 +4,8 @@ from PySide6.QtWidgets import QMainWindow, QWidget
 from backend.database.init_db import init_database
 from .components import PushButton, Text, VLayout, Alignment, Font, Modal, Icon
 
-ICON_PATH = getcwd() + "/frontend/ui/images/favicon.ico"
-isDatabaseInitialized: bool = False
-
-
-def setup_database():
-    global isDatabaseInitialized
-
-    if not isDatabaseInitialized:
-        init_database()
-        isDatabaseInitialized = True
-
+# Перенёс все константы в файл настройки
+from backend.settings import ICON_PATH
 
 class MainWindow(QMainWindow):
     def __init__(self, w=550, h=420):
@@ -34,9 +25,10 @@ class MainWindow(QMainWindow):
         h1_font = Font(36, family="Rubik Wet Paint")
         h1 = Text("Панель админа", h1_font)
 
+        # Rezar: перенёс логику проверки на существование БД в бэк инициализации
         create_scheme_btn = PushButton(
             "Создать схему и таблицы",
-            callback=setup_database,
+            callback=init_database,
         )
         add_entry_btn = PushButton(
             "Внести данные",
