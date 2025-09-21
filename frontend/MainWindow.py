@@ -2,7 +2,8 @@ from os import getcwd
 from PySide6.QtWidgets import QMainWindow, QWidget
 
 from backend.database.init_db import init_database
-from .components import PushButton, VLayout, Alignment, Modal, Icon, H1
+from .components import PushButton, VLayout, Alignment, Modal, Icon, H1, Size
+from .components.table import Table
 
 ICON_PATH = getcwd() + "/frontend/images/favicon.ico"
 isDatabaseInitialized: bool = False
@@ -14,6 +15,21 @@ def setup_database():
     if not isDatabaseInitialized:
         init_database()
         isDatabaseInitialized = True
+    else:
+        print("Database has already been initialized!")
+
+
+class AddEntryModal(Modal):
+    def __init__(self):
+        super().__init__(title="Добавление данных")
+
+
+class ViewTableModal(Modal):
+    def __init__(self):
+        super().__init__(title="Просмотр таблиц", max_size=Size(1000, 800))
+
+        table = Table()
+        self.gridLayout.addChildWidget(table)
 
 
 class MainWindow(QMainWindow):
@@ -25,8 +41,8 @@ class MainWindow(QMainWindow):
         self._setup_ui()
 
     def _setup_ui(self):
-        add_entry_modal = Modal(title="Добавление данных")
-        view_table_modal = Modal(title="Просмотр таблиц")
+        self.add_entry_modal = AddEntryModal()
+        self.view_table_modal = ViewTableModal()
 
         widget = QWidget()
         self.setCentralWidget(widget)
@@ -39,11 +55,11 @@ class MainWindow(QMainWindow):
         )
         add_entry_btn = PushButton(
             "Внести данные",
-            callback=lambda: add_entry_modal.show(),
+            callback=lambda: self.add_entry_modal.show(),
         )
         view_table_btn = PushButton(
             "Показать данные",
-            callback=lambda: view_table_modal.show(),
+            callback=lambda: self.view_table_modal.show(),
         )
 
         vbox = VLayout(children=[h1, create_scheme_btn, add_entry_btn, view_table_btn])

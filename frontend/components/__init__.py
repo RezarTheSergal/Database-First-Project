@@ -1,5 +1,5 @@
 from .PushButton import PushButton
-from .VLayout import VLayout
+from .Layouts import GridLayout, VLayout, HLayout
 from .Icon import Icon
 from .Alignment import Alignment
 from .Font import Font
@@ -9,10 +9,13 @@ from .Point import Point
 from .Modal import Modal
 from .Size import Size
 from .H1 import H1
+from .table.Table import Table
 
 __all__ = [
     "PushButton",
+    "GridLayout",
     "VLayout",
+    "HLayout",
     "Icon",
     "Alignment",
     "Font",
@@ -23,4 +26,5 @@ __all__ = [
     "Modal",
     "Size",
     "H1",
+    "Table",
 ]

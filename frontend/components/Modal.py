@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QWidget
 from .Size import Size
 from .Icon import Icon
+from .Layouts import GridLayout
 from .const import DEFAULT_MAX_SIZE
 from ..lib.utils import setClass
 from os import getcwd
@@ -24,3 +25,7 @@ class Modal(QWidget):
         self.setWindowIcon(Icon(ICON_PATH))
         setClass(self, "modal")
         self.setFocus()
+
+        gridLayout = GridLayout()
+        self.setLayout(gridLayout)
+        self.gridLayout = gridLayout
