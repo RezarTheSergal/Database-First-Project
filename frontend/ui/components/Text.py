@@ -4,8 +4,13 @@ from .Alignment import Alignment
 
 
 class Text(QLabel):
+
     def __init__(
-        self, text: str, font: Font, hasWordWrap=True, alignment=Alignment.Center.value
+        self,
+        text: str,
+        font: Font,
+        hasWordWrap=True,
+        alignment=Alignment.Center.value,
     ):
         super().__init__()
         self.setText(text)
