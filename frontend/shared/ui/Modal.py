@@ -29,3 +29,6 @@ class Modal(QWidget):
         gridLayout = GridLayout()
         self.setLayout(gridLayout)
         self.gridLayout = gridLayout
+
+    def add(self, child: QWidget):
+        self.gridLayout.addChildWidget(child)

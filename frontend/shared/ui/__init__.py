@@ -9,7 +9,6 @@ from .Point import Point
 from .Modal import Modal
 from .Size import Size
 from .H1 import H1
-from .table.Table import Table
 
 __all__ = [
     "PushButton",
@@ -26,5 +25,4 @@ __all__ = [
     "Modal",
     "Size",
     "H1",
-    "Table",
 ]

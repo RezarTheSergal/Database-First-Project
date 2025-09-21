@@ -2,8 +2,8 @@ from os import getcwd
 from PySide6.QtWidgets import QMainWindow, QWidget
 
 from backend.database.init_db import init_database
-from .components import PushButton, VLayout, Alignment, Modal, Icon, H1, Size
-from .components.table import Table
+from frontend.modals import AddEntryModal, ViewTableModal
+from .shared.ui import PushButton, VLayout, Alignment, Icon, H1
 
 ICON_PATH = getcwd() + "/frontend/images/favicon.ico"
 isDatabaseInitialized: bool = False
@@ -17,19 +17,6 @@ def setup_database():
         isDatabaseInitialized = True
     else:
         print("Database has already been initialized!")
-
-
-class AddEntryModal(Modal):
-    def __init__(self):
-        super().__init__(title="Добавление данных")
-
-
-class ViewTableModal(Modal):
-    def __init__(self):
-        super().__init__(title="Просмотр таблиц", max_size=Size(1000, 800))
-
-        table = Table()
-        self.gridLayout.addChildWidget(table)
 
 
 class MainWindow(QMainWindow):
