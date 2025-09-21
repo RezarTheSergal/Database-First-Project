@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from dotenv import load_dotenv
 import os
 
