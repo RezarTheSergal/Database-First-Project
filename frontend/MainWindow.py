@@ -1,22 +1,8 @@
-from os import getcwd
 from PySide6.QtWidgets import QMainWindow, QWidget
-
 from backend.database.init_db import init_database
 from frontend.modals import AddEntryModal, ViewTableModal
 from .shared.ui import PushButton, VLayout, Alignment, Icon, H1
-
-ICON_PATH = getcwd() + "/frontend/images/favicon.ico"
-isDatabaseInitialized: bool = False
-
-
-def setup_database():
-    global isDatabaseInitialized
-
-    if not isDatabaseInitialized:
-        init_database()
-        isDatabaseInitialized = True
-    else:
-        print("Database has already been initialized!")
+from backend.settings import ICON_PATH
 
 
 class MainWindow(QMainWindow):
@@ -36,9 +22,10 @@ class MainWindow(QMainWindow):
 
         h1 = H1("Панель админа")
 
+        # Rezar: перенёс логику проверки на существование БД в бэк инициализации
         create_scheme_btn = PushButton(
             "Создать схему и таблицы",
-            callback=setup_database,
+            callback=init_database,
         )
         add_entry_btn = PushButton(
             "Внести данные",

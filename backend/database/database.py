@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from backend.settings import PgConfig
@@ -22,7 +22,7 @@ class Database(metaclass=Singleton):
         self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
     @ExceptionHandler()
-    def create_database_engine(self):
+    def create_database_engine(self) -> Engine:
         """
         Создание движка SQLAlchemy с использованием настроек PgConfig
         """
@@ -57,14 +57,15 @@ class Database(metaclass=Singleton):
         finally:
             session.close()
 
-    def get_engine(self):
+    def get_engine(self) -> Engine:
         """
         Получить экземпляр движка базы данных
         """
         return self._engine
 
-    def get_database_url(self):
+    def get_database_url(self) -> str:
         """
         Получить URL базы данных из PgConfig
         """
         return self._pg_config.database_url()
+    

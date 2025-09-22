@@ -6,7 +6,7 @@
 import sys
 import logging
 from pathlib import Path
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect 
 from backend.utils.exception_handler import ExceptionHandler
 # Добавляем путь для импортов
 sys.path.append(str(Path(__file__).parent.parent))
@@ -20,7 +20,7 @@ db_engine = Database().get_engine()
 logger = logging.getLogger()
 
 @ExceptionHandler()
-def create_database_if_not_exists():
+def create_database_if_not_exists() -> True:
     """Создает базу данных, если она не существует"""
 
     pg_config = PgConfig()
@@ -52,11 +52,19 @@ def create_database_if_not_exists():
     
 
 @ExceptionHandler()
-def create_tables():
+def create_tables() -> None:
     """Создает все таблицы в базе данных"""
+
+    metadata_tables = set(Base.metadata.tables.keys())
+    db_tables = set(inspect(db_engine).get_table_names())
+
+    if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
+        logger.info("Все таблицы уже существуют!")
+        return
+
     Base.metadata.create_all(bind=db_engine)
     logger.info("Все таблицы успешно созданы!")
-        
+
     # Выводим список созданных таблиц
     with db_engine.connect() as conn:
         result = conn.execute(text("""
@@ -74,7 +82,7 @@ def create_tables():
                     
     
 @ExceptionHandler()
-def init_database():
+def init_database() -> bool:
     """
     Основная функция инициализации базы данных
     Создает БД (если не существует) и все таблицы

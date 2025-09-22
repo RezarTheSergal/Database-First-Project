@@ -1,10 +1,12 @@
 import sys
+import logging
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
-from const import STYLESHEET_PATH
 from frontend import MainWindow
 from backend.utils.logger import setup_logging
-from backend.settings import LOG_FILE_PATH
+
+# Перенёс все константы в файл настройки
+from backend.settings import LOG_FILE_PATH, STYLESHEET_PATH
 
 
 def keep_loop_running(app, engine):
