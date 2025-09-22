@@ -16,10 +16,14 @@ LOG_FILE_PATH = os.path.join(BASE_DIR, 'logs', 'latest.log')
 Path(LOG_FILE_PATH).parent.mkdir(exist_ok=True, parents=True)
 
 # Styles path (frontend)
-STYLESHEET_PATH = (Path(BASE_DIR).parent.resolve() / "frontend" / "ui" / "styles" / "style.css").__str__()
+STYLESHEET_PATH = (
+    Path(BASE_DIR).parent.resolve() / "frontend" / "styles" / "style.qss"
+).__str__()
 
 # Icon path (frontend)
-ICON_PATH = (Path(BASE_DIR).parent.resolve() / "frontend" / "ui" / "images" / "favicon.ico").__str__()
+ICON_PATH = (
+    Path(BASE_DIR).parent.resolve() / "frontend" / "images" / "favicon.ico"
+).__str__()
 
 # Postgres env setup
 HOST = os.getenv('DB_HOST', default='localhost')
