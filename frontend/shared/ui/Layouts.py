@@ -15,6 +15,9 @@ class VLayout(QVBoxLayout):
         if children:
             add_children(self, children)
 
+    def add_children(self, children: Children):
+        add_children(self, children)
+
 
 class HLayout(QHBoxLayout):
     def __init__(self, children: Children | None = None, gap_px: int = 10):
@@ -22,6 +25,9 @@ class HLayout(QHBoxLayout):
         self.setSpacing(gap_px)
         if children:
             add_children(self, children)
+
+    def add_children(self, children: Children):
+        add_children(self, children)
 
 
 class GridLayout(QGridLayout):

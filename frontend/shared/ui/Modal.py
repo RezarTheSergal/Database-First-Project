@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QPoint
 from .Size import Size
 from .Icon import Icon
 from .Layouts import GridLayout
@@ -16,8 +17,10 @@ class Modal(QWidget):
         max_size: Size = DEFAULT_MAX_SIZE,
         title="NO_TITLE",
         accessible_name="",
+        x: int = 0,
+        y: int = 360,
     ):
-        super().__init__()
+        super().__init__(pos=QPoint(x, y))
 
         self.setWindowTitle(title)
         self.setMaximumSize(max_size.w, max_size.h)
@@ -31,4 +34,4 @@ class Modal(QWidget):
         self.gridLayout = gridLayout
 
     def add(self, child: QWidget):
-        self.gridLayout.addChildWidget(child)
+        self.gridLayout.addWidget(child)

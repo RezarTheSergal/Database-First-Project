@@ -1,17 +1,26 @@
 from PySide6.QtWidgets import QTableWidget
 from PySide6.QtCore import Qt
+from frontend.shared.ui import SizeAdjustPolicy, Size
 from .TableItem import TableItem
 
 SortOrder = Qt.SortOrder
 TableRow = list[TableItem]
 
-
 class Table(QTableWidget):
     def __init__(self):
         super().__init__()
+        self.setMaximumSize(Size(600, 300))
         self.set_size(5, 5)
+        self.setSizeAdjustPolicy(SizeAdjustPolicy.AdjustToContents)
+        self.model().dataChanged.connect(lambda: self._resize())
+
         for _ in range(5):
             self.append_row([TableItem("1"), TableItem("2"), TableItem("3")])
+        self._resize()
+
+    def _resize(self):
+        self.resizeColumnsToContents()
+        self.resizeRowsToContents()
 
     def get_last_row_index(self) -> int:
         return self.rowCount() - 1

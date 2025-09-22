@@ -13,7 +13,7 @@ def get_model_by_tablename(table_name: str) -> Base | None:
     """
     for cls in Base.registry.mappers:
         if cls.class_.__tablename__ == table_name:
-            return cls.class_
+            return cls.class_  # type: ignore
     return None
 
 @ExceptionHandler()
@@ -21,26 +21,27 @@ def get_table_columns(table_name: str) -> Dict[str, type]:
     """
     Даёт возможность получать данные о полях в таблице
     """
-    result: Dict[str, type]
+    result: Dict[str, type] = {}
     model = get_model_by_tablename(table_name)
     for column in model.__table__.columns:
         result[column.key] = column.type
 
     return result
 
+
 @ExceptionHandler()
 def get_table_data(
-        table_name: str, 
-        columns_list: Optional[List] = None, 
-        filters_dict: Optional[Dict[str, Any]] = None, 
-        order_by: Optional[Dict[str, str]] = None
-        ) -> Tuple:
+    table_name: str,
+    columns_list: Optional[List] = None,
+    filters_dict: Optional[Dict[str, Any]] = None,
+    order_by: Optional[Dict[str, str]] = None,
+) -> Tuple:
     """
     Получение данных из таблицы по столбцам с фильтрами, сортировками
     """
     model = get_model_by_tablename(table_name)
-    
-    columns_intersected = set([key for key in get_table_columns(table_name).keys()]).intersection(columns_list)
+
+    columns_intersected = set([key for key in get_table_columns(table_name).keys()]).intersection(columns_list)  # type: ignore
 
     if columns_intersected:
         select_columns = [getattr(model, column) for column in columns_intersected]
@@ -70,7 +71,3 @@ def get_table_data(
             return result.all()  # кортежи значений выбранных колонок
         else:
             return result.scalars().all()  # ORM-объекты модели
-        
-
-            
-        
