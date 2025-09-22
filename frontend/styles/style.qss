@@ -1,0 +1,37 @@
+*,
+*::before,
+*::after {
+  padding: 0px;
+  margin: 0px;
+  font-size: 24px;
+  font-family: "Roboto";
+  color: #0ffa4a;
+}
+
+#h1, .h2, .h3 {
+  color: #0ffa4a;
+  font-size: 2em;
+  font-family: "RubikWetPaint";
+}
+
+QMainWindow, QWidget.modal {
+  background-color: black;
+}
+
+QPushButton {
+  color: #cde4ce;
+  background-color: #2b2b2b;
+  border: 1px solid #0ffa4a;
+  border-radius: 5px;
+  padding: 10px 16px;
+}
+
+QPushButton:hover {
+  background-color: #20462a;
+}
+
+QPushButton:pressed {
+  background-color: #0ffa4a;
+  color: #cde4ce;
+}
+
