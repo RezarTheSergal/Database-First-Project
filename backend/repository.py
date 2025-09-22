@@ -1,5 +1,6 @@
 # Содержит функции или классы, которые реализуют все запросы к базе (чтение, запись, обновление, удаление).
 
+from collections import defaultdict
 from backend.utils.exception_handler import ExceptionHandler
 from database.models import Base
 from database.database import Database
@@ -17,11 +18,18 @@ def get_model_by_tablename(table_name: str) -> Base | None:
     return None
 
 @ExceptionHandler()
+def get_tablenames() -> List[str]:
+    """
+    Получение списка имён таблиц
+    """
+    return [cls.class_.__tablename__ for cls in Base.registry.mappers]
+
+@ExceptionHandler()
 def get_table_columns(table_name: str) -> Dict[str, type]:
     """
-    Даёт возможность получать данные о полях в таблице
+    Даёт возможность получать названия полей в таблице
     """
-    result: Dict[str, type]
+    result: Dict[str, type] = defaultdict()
     model = get_model_by_tablename(table_name)
     for column in model.__table__.columns:
         result[column.key] = column.type
@@ -31,7 +39,7 @@ def get_table_columns(table_name: str) -> Dict[str, type]:
 @ExceptionHandler()
 def get_table_data(
         table_name: str, 
-        columns_list: Optional[List] = None, 
+        columns_list: Optional[List] = [], 
         filters_dict: Optional[Dict[str, Any]] = None, 
         order_by: Optional[Dict[str, str]] = None
         ) -> Tuple:
