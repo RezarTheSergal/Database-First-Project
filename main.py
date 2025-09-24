@@ -3,10 +3,8 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
 from frontend import MainWindow
 from backend.utils.logger import setup_logging
-
 # Перенёс все константы в файл настройки
 from backend.settings import LOG_FILE_PATH, STYLESHEET_PATH
-
 
 def keep_loop_running(app, engine):
     del engine
@@ -28,7 +26,6 @@ def apply_stylesheet(app: QApplication):
 def setup_frontend():
     app = QApplication(sys.argv)
     apply_stylesheet(app)
-
     engine = QQmlApplicationEngine(app)
 
     main_window = MainWindow()
