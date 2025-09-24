@@ -18,7 +18,7 @@ class DatabaseRepository:
     
     @classmethod
     @DatabaseErrorHandler()
-    def get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
+    def get_model_by_tablename(cls, table_name: str) -> DatabaseResponse:
         """Получение класса таблицы по её имени"""
         if table_name is None or not isinstance(table_name, str):
             return DatabaseResponse.error(
@@ -41,7 +41,8 @@ class DatabaseRepository:
         )
     
     @classmethod
-    def get_tablenames(self) -> DatabaseResponse:
+    @DatabaseErrorHandler()
+    def get_tablenames(cls) -> DatabaseResponse:
         """Получение списка имён таблиц"""
         try:
             tables = [cls.class_.__tablename__ for cls in Base.registry.mappers]
@@ -55,9 +56,11 @@ class DatabaseRepository:
                 f"Ошибка при получении списка таблиц: {str(e)}"
             )
     
-    def get_table_columns(self, table_name: str) -> DatabaseResponse:
+    @classmethod
+    @DatabaseErrorHandler()
+    def get_table_columns(cls, table_name: str) -> DatabaseResponse:
         """Получение названий полей и их типов в таблице"""
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -81,9 +84,10 @@ class DatabaseRepository:
                 f"Ошибка при получении колонок таблицы '{table_name}': {str(e)}"
             )
     
+    @classmethod
     @DatabaseErrorHandler(max_retries=5, retry_after=1)
     def get_table_data(
-        self,
+        cls,
         table_name: str,
         columns_list: Optional[List[str]] = None,
         filters_dict: Optional[Dict[str, Any]] = None,
@@ -94,14 +98,14 @@ class DatabaseRepository:
         """Получение данных из таблицы с фильтрами и сортировкой"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
         model = model_response.data
         
         # Получаем информацию о колонках
-        columns_response = self.get_table_columns(table_name)
+        columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
         
@@ -186,19 +190,20 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"get_table_data for {table_name}")
     
+    @classmethod
     @DatabaseErrorHandler()
-    def insert_into_table(self, table_name: str, params: Dict[str, Any]) -> DatabaseResponse:
+    def insert_into_table(cls, table_name: str, params: Dict[str, Any]) -> DatabaseResponse:
         """Вставка значений в таблицу"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
         model = model_response.data
         
         # Получаем информацию о колонках
-        columns_response = self.get_table_columns(table_name)
+        columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
         
@@ -244,9 +249,10 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"insert_into_table for {table_name}")
     
+    @classmethod
     @DatabaseErrorHandler()
     def update_table_data(
-        self, 
+        cls, 
         table_name: str, 
         update_params: Dict[str, Any], 
         filters_dict: Dict[str, Any]
@@ -254,14 +260,14 @@ class DatabaseRepository:
         """Обновление данных в таблице"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
         model = model_response.data
         
         # Получаем информацию о колонках
-        columns_response = self.get_table_columns(table_name)
+        columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
         
@@ -302,19 +308,20 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"update_table_data for {table_name}")
     
+    @classmethod
     @DatabaseErrorHandler()
-    def delete_from_table(self, table_name: str, filters_dict: Dict[str, Any]) -> DatabaseResponse:
+    def delete_from_table(cls, table_name: str, filters_dict: Dict[str, Any]) -> DatabaseResponse:
         """Удаление данных из таблицы"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
         model = model_response.data
         
         # Получаем информацию о колонках
-        columns_response = self.get_table_columns(table_name)
+        columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
         
