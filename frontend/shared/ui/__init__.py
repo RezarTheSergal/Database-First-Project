@@ -12,6 +12,7 @@ from .H1 import H1
 from .Spinner import Spinner
 from .Widget import Widget
 from .SizeAdjustPolicy import SizeAdjustPolicy
+from .Hr import Hr
 
 __all__ = [
     "PushButton",
@@ -31,4 +32,5 @@ __all__ = [
     "Widget",
     "SizeAdjustPolicy",
     "H1",
+    "Hr",
 ]

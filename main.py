@@ -21,7 +21,7 @@ def keep_loop_running(app, engine):
 
 
 def apply_stylesheet(app: QApplication):
-    stylesheet = open(STYLESHEET_PATH, "r").read()
+    stylesheet = open(STYLESHEET_PATH, "r", encoding="utf8").read()
     app.setStyleSheet(stylesheet)
 
 
