@@ -85,7 +85,7 @@ class DatabaseRepository:
             )
     
     @classmethod
-    @DatabaseErrorHandler(max_retries=5, retry_after=1)
+    @DatabaseErrorHandler()
     def get_table_data(
         cls,
         table_name: str,
@@ -124,7 +124,7 @@ class DatabaseRepository:
             select_columns = [model]
         
         try:
-            with Database.get_db_session() as session:
+            with Database().get_db_session() as session:
                 query = select(*select_columns)
                 
                 # Применяем фильтры
@@ -230,7 +230,7 @@ class DatabaseRepository:
             logger.warning(f"Игнорируем некорректные параметры: {invalid_params}")
         
         try:
-            with Database.get_db_session() as session:
+            with Database().get_db_session() as session:
                 query = insert(model).values(valid_params)
                 result = session.execute(query)
                 session.commit()
@@ -290,7 +290,7 @@ class DatabaseRepository:
             )
         
         try:
-            with Database.get_db_session() as session:
+            with Database().get_db_session() as session:
                 filters = [getattr(model, key) == value for key, value in filters_dict.items()]
                 query = update(model).where(and_(*filters)).values(update_params)
                 result = session.execute(query)
@@ -342,7 +342,7 @@ class DatabaseRepository:
             )
         
         try:
-            with Database.get_db_session() as session:
+            with Database().get_db_session() as session:
                 filters = [getattr(model, key) == value for key, value in filters_dict.items()]
                 query = delete(model).where(and_(*filters))
                 result = session.execute(query)
