@@ -23,7 +23,6 @@ class ExceptionHandler:
         self.logger = logger or self._default_logger or logging.getLogger()
     
     def __call__(self, func: Callable) -> Callable:
-        """Декоратор метода"""
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:

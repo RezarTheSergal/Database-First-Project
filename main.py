@@ -1,11 +1,12 @@
 import sys
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
-from frontend import MainWindow
+# from frontend import MainWindow
 from backend.utils.logger import setup_logging
+from backend.database.init_db import init_database
 # Перенёс все константы в файл настройки
 from backend.settings import LOG_FILE_PATH, STYLESHEET_PATH
-
+from backend.repository import DatabaseRepository
 
 def keep_loop_running(app, engine):
     del engine
@@ -37,4 +38,9 @@ def setup_frontend():
 
 if __name__ == "__main__":
     setup_logging(log_file=LOG_FILE_PATH)
-    setup_frontend()
+    init_database()
+    rep = DatabaseRepository()
+    table_names = rep.get_tablenames().to_dict()['data']
+    table_columns = rep.get_table_columns(table_names[0]).to_dict()
+    print(table_columns)
+    # setup_frontend()
