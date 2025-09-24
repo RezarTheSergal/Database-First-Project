@@ -13,6 +13,8 @@ from .Spinner import Spinner
 from .Widget import Widget
 from .SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
+from .Row import Row
+from .InputBox import InputBox
 
 __all__ = [
     "PushButton",
@@ -33,4 +35,6 @@ __all__ = [
     "SizeAdjustPolicy",
     "H1",
     "Hr",
+    "Row",
+    "InputBox",
 ]
