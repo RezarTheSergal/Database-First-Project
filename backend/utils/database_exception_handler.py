@@ -14,7 +14,6 @@ import logging
 
 from .responce_types import ErrorCode, DatabaseResponse
 from .exception_handler import ExceptionHandler, T, P
-logger = logging.getLogger()
 
 class DatabaseErrorHandler(ExceptionHandler):
     """Централизованный обработчик ошибок базы данных"""
@@ -40,7 +39,7 @@ class DatabaseErrorHandler(ExceptionHandler):
     def handle_exception(cls, e: Exception, operation: str = "") -> DatabaseResponse:
         """Обработка исключений и преобразование в стандартизированный ответ"""
         
-        logger.error(f"Database error during {operation}: {str(e)}", exc_info=True)
+        logging.error(f"Database error during {operation}: {str(e)}", exc_info=True)
         
         # Определяем тип ошибки и соответствующий код
         error_code = cls.ERROR_MAPPING.get(type(e), ErrorCode.UNKNOWN_ERROR)
@@ -101,21 +100,26 @@ class DatabaseErrorHandler(ExceptionHandler):
         """Декоратор для автоматической обработки ошибок БД"""
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            for i in range(self.max_retries):
+            for i in range(self.max_retries+1):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    if self.log_error and self.logger:
-                        self.logger.error(
-                            f"Ошибка в {func.__name__}: {e}, Поытка номер: {i+1}/{self.max_retries}", 
-                            exc_info=True
-                        )
-                    if self.max_retries > i:
-                        time.sleep(self.retry_after)
-                        continue
+                    if i != self.max_retries:
+                        if self.log_error and self.logger:
+                            self.logger.error(
+                                f"Ошибка в {func.__name__}: {e}, Поытка номер: {i+1}/{self.max_retries}", 
+                                exc_info=True
+                            )
+                        if self.max_retries > i:
+                            time.sleep(self.retry_after)
+                            continue
                     return DatabaseErrorHandler.handle_exception(
                         e, 
                         func.__name__
                     )
-                return func(*args, **kwargs)
+            return DatabaseResponse.error(
+                error_code=ErrorCode.UNKNOWN_ERROR,
+                message=f"Неожиданное завершение функции {func.__name__}",
+                error_details={}
+            )
         return wrapper
