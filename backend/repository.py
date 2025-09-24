@@ -5,8 +5,8 @@ import logging
 from backend.utils.database_exception_handler import DatabaseErrorHandler
 from backend.utils.exception_handler import ExceptionHandler
 from backend.utils.responce_types import DatabaseResponse, ErrorCode, ResponseStatus
-from database.models import Base
-from database.database import Database
+from backend.database.models import Base
+from backend.database.database import Database
 from sqlalchemy import Tuple, and_, asc, delete, desc, select, insert, update
 from typing import Dict, List, Optional, Any
 
