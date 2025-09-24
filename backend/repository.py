@@ -14,15 +14,12 @@ db_engine = Database().get_engine()
 logger = logging.getLogger()
 
 class DatabaseRepository:
-    """Централизованный репозиторий для работы с базой данных"""
-    
-    def __init__(self):
-        self.db = Database()
+    """Репозиторий для работы с базой данных"""
     
     @DatabaseErrorHandler()
-    def _get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
+    def get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
         """Получение класса таблицы по её имени"""
-        if not table_name or not isinstance(table_name, str):
+        if table_name is None or not isinstance(table_name, str):
             return DatabaseResponse.error(
                 ErrorCode.INVALID_PARAMETERS,
                 "Некорректное имя таблицы"
@@ -42,7 +39,6 @@ class DatabaseRepository:
             f"Таблица '{table_name}' не найдена"
         )
     
-    @DatabaseErrorHandler()
     def get_tablenames(self) -> DatabaseResponse:
         """Получение списка имён таблиц"""
         try:
@@ -57,10 +53,9 @@ class DatabaseRepository:
                 f"Ошибка при получении списка таблиц: {str(e)}"
             )
     
-    @DatabaseErrorHandler()
     def get_table_columns(self, table_name: str) -> DatabaseResponse:
         """Получение названий полей и их типов в таблице"""
-        model_response = self._get_model_by_tablename(table_name)
+        model_response = self.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -70,11 +65,7 @@ class DatabaseRepository:
         try:
             for column in model.__table__.columns:
                 columns_info[column.key] = {
-                    'type': str(column.type),
-                    'nullable': column.nullable,
-                    'primary_key': column.primary_key,
-                    'foreign_keys': [str(fk) for fk in column.foreign_keys],
-                    'default': str(column.default) if column.default else None
+                    'type': str(column.type)
                 }
             
             return DatabaseResponse.success(
@@ -88,7 +79,7 @@ class DatabaseRepository:
                 f"Ошибка при получении колонок таблицы '{table_name}': {str(e)}"
             )
     
-    @DatabaseErrorHandler()
+    @DatabaseErrorHandler(max_retries=5, retry_after=1)
     def get_table_data(
         self,
         table_name: str,
@@ -101,7 +92,7 @@ class DatabaseRepository:
         """Получение данных из таблицы с фильтрами и сортировкой"""
         
         # Получаем модель
-        model_response = self._get_model_by_tablename(table_name)
+        model_response = self.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -112,11 +103,9 @@ class DatabaseRepository:
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
         
-        available_columns = set(columns_response.data.keys())
-        
         # Проверяем запрашиваемые колонки
         if columns_list:
-            invalid_columns = set(columns_list) - available_columns
+            invalid_columns = set(columns_response).difference(columns_list)
             if invalid_columns:
                 return DatabaseResponse.error(
                     ErrorCode.COLUMN_NOT_FOUND,
@@ -129,12 +118,12 @@ class DatabaseRepository:
             select_columns = [model]
         
         try:
-            with self.db.get_db_session() as session:
+            with Database.get_db_session() as session:
                 query = select(*select_columns)
                 
                 # Применяем фильтры
                 if filters_dict:
-                    invalid_filter_columns = set(filters_dict.keys()) - available_columns
+                    invalid_filter_columns = set(columns_response).difference(filters_dict.keys())
                     if invalid_filter_columns:
                         return DatabaseResponse.error(
                             ErrorCode.INVALID_FILTER,
@@ -146,7 +135,7 @@ class DatabaseRepository:
                 
                 # Применяем сортировку
                 if order_by:
-                    invalid_order_columns = set(order_by.keys()) - available_columns
+                    invalid_order_columns = set(columns_response).difference(order_by.keys())
                     if invalid_order_columns:
                         return DatabaseResponse.error(
                             ErrorCode.INVALID_ORDER_BY,
@@ -200,7 +189,7 @@ class DatabaseRepository:
         """Вставка значений в таблицу"""
         
         # Получаем модель
-        model_response = self._get_model_by_tablename(table_name)
+        model_response = self.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -234,7 +223,7 @@ class DatabaseRepository:
             logger.warning(f"Игнорируем некорректные параметры: {invalid_params}")
         
         try:
-            with self.db.get_db_session() as session:
+            with Database.get_db_session() as session:
                 query = insert(model).values(valid_params)
                 result = session.execute(query)
                 session.commit()
@@ -263,7 +252,7 @@ class DatabaseRepository:
         """Обновление данных в таблице"""
         
         # Получаем модель
-        model_response = self._get_model_by_tablename(table_name)
+        model_response = self.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -293,7 +282,7 @@ class DatabaseRepository:
             )
         
         try:
-            with self.db.get_db_session() as session:
+            with Database.get_db_session() as session:
                 filters = [getattr(model, key) == value for key, value in filters_dict.items()]
                 query = update(model).where(and_(*filters)).values(update_params)
                 result = session.execute(query)
@@ -316,7 +305,7 @@ class DatabaseRepository:
         """Удаление данных из таблицы"""
         
         # Получаем модель
-        model_response = self._get_model_by_tablename(table_name)
+        model_response = self.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -344,7 +333,7 @@ class DatabaseRepository:
             )
         
         try:
-            with self.db.get_db_session() as session:
+            with Database.get_db_session() as session:
                 filters = [getattr(model, key) == value for key, value in filters_dict.items()]
                 query = delete(model).where(and_(*filters))
                 result = session.execute(query)

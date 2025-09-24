@@ -1,4 +1,5 @@
 from functools import wraps
+import time
 from typing import Callable
 from sqlalchemy.exc import (
     SQLAlchemyError, IntegrityError, DataError, DatabaseError,
@@ -12,12 +13,12 @@ from psycopg2.errors import (
 import logging
 
 from .responce_types import ErrorCode, DatabaseResponse
-from .exception_handler import ExceptionHandler
+from .exception_handler import ExceptionHandler, T, P
 logger = logging.getLogger()
 
 class DatabaseErrorHandler(ExceptionHandler):
     """Централизованный обработчик ошибок базы данных"""
-    
+
     ERROR_MAPPING = {
         # SQLAlchemy errors
         OperationalError: ErrorCode.CONNECTION_FAILED,
@@ -96,20 +97,25 @@ class DatabaseErrorHandler(ExceptionHandler):
         )
     
     # Декоратор для автоматической обработки ошибок
-    def __call__(self, func: Callable) -> Callable:
+    def __call__(self, func:Callable[P, T]) -> Callable[P, T]:
         """Декоратор для автоматической обработки ошибок БД"""
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            for i in range(self.max_retries):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
                     if self.log_error and self.logger:
                         self.logger.error(
-                            f"Ошибка в {func.__name__}: {e}", 
+                            f"Ошибка в {func.__name__}: {e}, Поытка номер: {i+1}/{self.max_retries}", 
                             exc_info=True
-                    )
+                        )
+                    if self.max_retries > i:
+                        time.sleep(self.retry_after)
+                        continue
                     return DatabaseErrorHandler.handle_exception(
                         e, 
                         func.__name__
                     )
+                return func(*args, **kwargs)
         return wrapper

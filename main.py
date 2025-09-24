@@ -41,6 +41,6 @@ if __name__ == "__main__":
     init_database()
     rep = DatabaseRepository()
     table_names = rep.get_tablenames().to_dict()['data']
-    table_columns = rep.get_table_columns(table_names[0]).to_dict()
+    table_columns = rep.get_table_data()
     print(table_columns)
     # setup_frontend()
