@@ -70,7 +70,11 @@ class DatabaseRepository:
         try:
             for column in model.__table__.columns:  # type: ignore
                 columns_info[column.key] = {
-                    'type': str(column.type)
+                    'type': str(column.type),
+                    'nullable': column.nullable,
+                    'primary_key': column.primary_key,
+                    'foreign_keys': [str(fk) for fk in column.foreign_keys],
+                    'default': str(column.default) if column.default else None
                 }
 
             return DatabaseResponse.success(
