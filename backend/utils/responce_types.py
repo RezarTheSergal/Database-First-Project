@@ -69,7 +69,10 @@ class DatabaseResponse:
             result["data"] = self.data
             
         if self.error_code:
-            result["error_code"] = self.error_code.value
+            if type(self.error_code) == str:
+                result["error_code"] = self.error_code
+            else:
+                result["error_code"] = self.error_code.value
             
         if self.error_details:
             result["error_details"] = self.error_details

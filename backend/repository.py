@@ -16,6 +16,7 @@ logger = logging.getLogger()
 class DatabaseRepository:
     """Репозиторий для работы с базой данных"""
     
+    @classmethod
     @DatabaseErrorHandler()
     def get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
         """Получение класса таблицы по её имени"""
@@ -39,6 +40,7 @@ class DatabaseRepository:
             f"Таблица '{table_name}' не найдена"
         )
     
+    @classmethod
     def get_tablenames(self) -> DatabaseResponse:
         """Получение списка имён таблиц"""
         try:

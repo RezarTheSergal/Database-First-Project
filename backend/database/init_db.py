@@ -8,6 +8,7 @@ import logging
 from pathlib import Path
 from sqlalchemy import create_engine, text, inspect 
 from backend.utils.database_exception_handler import DatabaseErrorHandler
+from backend.utils.responce_types import DatabaseResponse, ErrorCode
 # Добавляем путь для импортов
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -20,7 +21,7 @@ db_engine = Database().get_engine()
 logger = logging.getLogger()
 
 @DatabaseErrorHandler()
-def create_database_if_not_exists() -> True:
+def create_database_if_not_exists() -> DatabaseResponse:
     """Создает базу данных, если она не существует"""
 
     pg_config = PgConfig()
@@ -47,12 +48,12 @@ def create_database_if_not_exists() -> True:
         else:
             logger.info(f"База данных '{db_name}' уже существует")
                 
-    return True
+    return DatabaseResponse.success()
 
     
 
 @DatabaseErrorHandler()
-def create_tables() -> None:
+def create_tables() -> DatabaseResponse:
     """Создает все таблицы в базе данных"""
 
     metadata_tables = set(Base.metadata.tables.keys())
@@ -60,7 +61,7 @@ def create_tables() -> None:
 
     if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
         logger.info("Все таблицы уже существуют!")
-        return
+        return DatabaseResponse.success()
 
     Base.metadata.create_all(bind=db_engine)
     logger.info("Все таблицы успешно созданы!")
@@ -76,27 +77,37 @@ def create_tables() -> None:
             
         tables = result.fetchall()
         if tables:
-            logging.info("Список созданных таблиц:")
+            logger.info("Список созданных таблиц:")
             for table in tables:
                 print(f"   - {table[0]}")
+    return DatabaseResponse.success()
                     
     
 @DatabaseErrorHandler()
-def init_database() -> bool:
+def init_database() -> DatabaseResponse:
     """
     Основная функция инициализации базы данных
     Создает БД (если не существует) и все таблицы
     Возвращает True при успехе, False при ошибке
     """
-    logging.info("Инициализация базы данных...")
-    
+    logger.info("Инициализация базы данных...")
+    created_db = create_database_if_not_exists().to_dict()
     # Создаем базу данных, если не существует
-    if not create_database_if_not_exists():
-        return False
+    if created_db.get("status", "success") == "error":
+        return DatabaseResponse.error(
+            error_code=created_db.get("error_code", ErrorCode.UNKNOWN_ERROR),
+            message="Не удалось создать базу данных",
+            error_details=created_db.get("error_details", {})
+        )
     
+    created_tables = create_tables().to_dict()
     # Создаем таблицы
-    if not create_tables():
-        return False
+    if created_tables.get("status", "success") == "error":
+        return DatabaseResponse.error(
+            error_code=created_tables.get("error_code", ErrorCode.UNKNOWN_ERROR),
+            message="Не удалось создать таблицы",
+            error_details=created_tables.get("error_details", {})
+        )
     
     logger.info("База данных успешно инициализирована!")
-    return True
+    return DatabaseResponse.success()
