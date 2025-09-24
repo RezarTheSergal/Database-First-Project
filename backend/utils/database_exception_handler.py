@@ -1,3 +1,5 @@
+from functools import wraps
+from typing import Callable
 from sqlalchemy.exc import (
     SQLAlchemyError, IntegrityError, DataError, DatabaseError,
     OperationalError, ProgrammingError, InvalidRequestError,
@@ -10,10 +12,10 @@ from psycopg2.errors import (
 import logging
 
 from .responce_types import ErrorCode, DatabaseResponse
-
+from .exception_handler import ExceptionHandler
 logger = logging.getLogger()
 
-class DatabaseErrorHandler:
+class DatabaseErrorHandler(ExceptionHandler):
     """Централизованный обработчик ошибок базы данных"""
     
     ERROR_MAPPING = {
@@ -92,18 +94,22 @@ class DatabaseErrorHandler:
             message=message,
             error_details=error_details
         )
-
-# Декоратор для автоматической обработки ошибок
-def db_operation(operation_name: str = ""):
-    """Декоратор для автоматической обработки ошибок БД"""
-    def decorator(func):
+    
+    # Декоратор для автоматической обработки ошибок
+    def __call__(self, func: Callable) -> Callable:
+        """Декоратор для автоматической обработки ошибок БД"""
+        @wraps(func)
         def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                return DatabaseErrorHandler.handle_exception(
-                    e, 
-                    operation_name or func.__name__
-                )
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if self.log_error and self.logger:
+                        self.logger.error(
+                            f"Ошибка в {func.__name__}: {e}", 
+                            exc_info=True
+                    )
+                    return DatabaseErrorHandler.handle_exception(
+                        e, 
+                        func.__name__
+                    )
         return wrapper
-    return decorator

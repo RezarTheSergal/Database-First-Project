@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 import logging
-from backend.utils.database_exception_handler import DatabaseErrorHandler, db_operation
+from backend.utils.database_exception_handler import DatabaseErrorHandler
 from backend.utils.exception_handler import ExceptionHandler
 from backend.utils.responce_types import DatabaseResponse, ErrorCode, ResponseStatus
 from database.models import Base
@@ -19,8 +19,8 @@ class DatabaseRepository:
     def __init__(self):
         self.db = Database()
     
-    @db_operation("get_model_by_tablename")
-    def get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
+    @DatabaseErrorHandler()
+    def _get_model_by_tablename(self, table_name: str) -> DatabaseResponse:
         """Получение класса таблицы по её имени"""
         if not table_name or not isinstance(table_name, str):
             return DatabaseResponse.error(
@@ -42,7 +42,7 @@ class DatabaseRepository:
             f"Таблица '{table_name}' не найдена"
         )
     
-    @db_operation("get_tablenames")
+    @DatabaseErrorHandler()
     def get_tablenames(self) -> DatabaseResponse:
         """Получение списка имён таблиц"""
         try:
@@ -57,10 +57,10 @@ class DatabaseRepository:
                 f"Ошибка при получении списка таблиц: {str(e)}"
             )
     
-    @db_operation("get_table_columns")
+    @DatabaseErrorHandler()
     def get_table_columns(self, table_name: str) -> DatabaseResponse:
         """Получение названий полей и их типов в таблице"""
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = self._get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -88,7 +88,7 @@ class DatabaseRepository:
                 f"Ошибка при получении колонок таблицы '{table_name}': {str(e)}"
             )
     
-    @db_operation("get_table_data")
+    @DatabaseErrorHandler()
     def get_table_data(
         self,
         table_name: str,
@@ -101,7 +101,7 @@ class DatabaseRepository:
         """Получение данных из таблицы с фильтрами и сортировкой"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = self._get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -195,12 +195,12 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"get_table_data for {table_name}")
     
-    @db_operation("insert_into_table")
+    @DatabaseErrorHandler()
     def insert_into_table(self, table_name: str, params: Dict[str, Any]) -> DatabaseResponse:
         """Вставка значений в таблицу"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = self._get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -253,7 +253,7 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"insert_into_table for {table_name}")
     
-    @db_operation("update_table_data")
+    @DatabaseErrorHandler()
     def update_table_data(
         self, 
         table_name: str, 
@@ -263,7 +263,7 @@ class DatabaseRepository:
         """Обновление данных в таблице"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = self._get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
@@ -311,12 +311,12 @@ class DatabaseRepository:
         except Exception as e:
             return DatabaseErrorHandler.handle_exception(e, f"update_table_data for {table_name}")
     
-    @db_operation("delete_from_table")
+    @DatabaseErrorHandler()
     def delete_from_table(self, table_name: str, filters_dict: Dict[str, Any]) -> DatabaseResponse:
         """Удаление данных из таблицы"""
         
         # Получаем модель
-        model_response = self.get_model_by_tablename(table_name)
+        model_response = self._get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
         
