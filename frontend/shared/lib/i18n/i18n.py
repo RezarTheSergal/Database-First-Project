@@ -17,6 +17,7 @@ TRANSLATIONS = {
     "location": "Место",
     "install_date": "Дата установки",
     "status": "Статус",
+    "last_service": "Дата последнего обслуживания",
 }
 
 

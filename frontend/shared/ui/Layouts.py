@@ -9,10 +9,13 @@ def add_children(layout: QLayout, children: Children):
 
 
 def clean(layout: QLayout):
-    while layout.count():
-        child = layout.takeAt(0)
-        if child.widget():
-            child.widget().deleteLater()
+    if layout is not None:
+        for i in reversed(range(layout.count())):
+            child = layout.takeAt(i)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+            elif child.layout() is not None:
+                clean(child.layout())  # Clear nested layout
 
 
 class VLayout(QVBoxLayout):
