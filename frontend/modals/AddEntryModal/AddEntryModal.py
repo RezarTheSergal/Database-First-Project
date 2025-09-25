@@ -4,6 +4,9 @@ from .AddEntryForm import AddEntryForm
 
 class AddEntryModal(Modal):
     def __init__(self):
-        super().__init__(title="Добавление данных", max_size=Size(600, 1000), x=1400)
-        self.setMinimumSize(Size(400, 200))
+        super().__init__(title="Добавление данных", x=1400)
+
+        self.setMinimumSize(Size(1000, 500))
+        self.setMaximumSize(Size(2000, 1000))
+
         self.add(AddEntryForm())
