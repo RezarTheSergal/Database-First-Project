@@ -1,3 +1,10 @@
+/*
+=== ПАЛИТРА ===
+Фон окна: background-color: rgb(8, 20, 15) до rgb(1, 7, 4)
+Граница кнопки: rgb(43, 87, 71)
+Градиент кнопки: от rgb(25, 57, 46) до rgb(22, 47, 39) (СЛЕВА-НАПРАВО)
+ */
+
 *,
 *::before,
 *::after {
@@ -8,21 +15,21 @@
   color: #0ffa4a;
 }
 
-#h1, .h2, .h3 {
-  color: #0ffa4a;
-  font-size: 2em;
-  font-family: "RubikWetPaint";
+QMainWindow, QWidget.modal {
+  background-color: qradialgradient(cx:0.5, cy:0.5, radius:1, fx:0, fy:0, stop:0 rgb(8, 20, 15), stop:1 rgb(1, 7, 4));
 }
 
-QMainWindow, QWidget.modal {
-  background-color: black;
+.hr {
+  border: none;
+  background-color: qradialgradient(cx:0.5, cy:0.5, radius:1, fx:0, fy:0, stop:0 rgb(25, 57, 46), stop:1 rgb(22, 47, 39));
 }
 
 QPushButton {
   color: #cde4ce;
-  background-color: #2b2b2b;
-  border: 1px solid #0ffa4a;
-  border-radius: 5px;
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                                     stop:0 rgb(25, 57, 46), stop:1 rgb(22, 47, 39));
+  border: 1px solid rgb(43, 87, 71);
+  border-radius: 16px;
   padding: 10px 16px;
 }
 
