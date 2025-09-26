@@ -7,9 +7,9 @@ from backend.utils.exception_handler import ExceptionHandler
 from backend.utils.responce_types import DatabaseResponse, ErrorCode, ResponseStatus
 from backend.database.models import Base
 from backend.database.database import Database
-from sqlalchemy import Tuple, and_, asc, delete, desc, select, insert, update
+from sqlalchemy import CheckConstraint, TextClause, Tuple, and_, asc, delete, desc, select, insert, update
 from typing import Dict, List, Optional, Any
-
+from sqlalchemy import Enum as SQLEnum, CheckConstraint
 db_engine = Database().get_engine()
 logger = logging.getLogger()
 
@@ -59,23 +59,63 @@ class DatabaseRepository:
     @classmethod
     @DatabaseErrorHandler()
     def get_table_columns(cls, table_name: str) -> DatabaseResponse:
-        """Получение названий полей и их типов в таблице"""
+        """Получение полной информации о колонках таблицы, включая типы, внешние ключи, enum-значения и ограничения."""
         model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
 
         model = model_response.data
-        columns_info = {}
+        columns_info: Dict[str, Dict[str, Any]] = {}
 
         try:
-            for column in model.__table__.columns:  # type: ignore
-                columns_info[column.key] = {
+            # Собираем check constraints на уровне таблицы, сгруппированные по колонкам (приблизительно)
+            table_check_constraints: Dict[str, List[str]] = {}
+            for constraint in model.__table__.constraints:
+                if isinstance(constraint, CheckConstraint):
+                    # Пытаемся извлечь имя колонки из текста условия (упрощённо)
+                    # Это не идеально, но работает для простых случаев вроде "value >= 0"
+                    sql_text = str(constraint.sqltext) if isinstance(constraint.sqltext, TextClause) else str(constraint.sqltext.compile())
+                    # Простой способ: ищем имя колонки как первое слово до оператора
+                    # Лучше — использовать парсинг, но для демо подойдёт
+                    for col in model.__table__.columns:
+                        if col.name in sql_text:
+                            table_check_constraints.setdefault(col.name, []).append(sql_text)
+
+            for column in model.__table__.columns:
+                col_info = {
+                    'name': column.name,
                     'type': str(column.type),
                     'nullable': column.nullable,
                     'primary_key': column.primary_key,
-                    'foreign_keys': [str(fk) for fk in column.foreign_keys],
-                    'default': str(column.default) if column.default else None
+                    'default': None,
+                    'foreign_keys': [],
+                    'check_constraints': table_check_constraints.get(column.name, []),
+                    'enum_values': None  # Будет заполнено, если тип — Enum
                 }
+
+                # Обработка default
+                if column.default is not None:
+                    if hasattr(column.default, 'arg'):
+                        col_info['default'] = str(column.default.arg)
+                    else:
+                        col_info['default'] = str(column.default)
+
+                # Обработка foreign keys
+                for fk in column.foreign_keys:
+                    col_info['foreign_keys'].append({
+                        'target_table': fk.column.table.name,
+                        'target_column': fk.column.name
+                    })
+
+                # Обработка Enum
+                if isinstance(column.type, SQLEnum):
+                    if hasattr(column.type, 'enums') and column.type.enums:
+                        col_info['enum_values'] = list(column.type.enums)
+                    elif hasattr(column.type, 'native_enum') and not column.type.native_enum:
+                        # Если используется строковый enum без native поддержки
+                        col_info['enum_values'] = [e for e in column.type.enums] if column.type.enums else None
+
+                columns_info[column.name] = col_info
 
             return DatabaseResponse.success(
                 data=columns_info,
@@ -87,7 +127,6 @@ class DatabaseRepository:
                 ErrorCode.OPERATION_FAILED,
                 f"Ошибка при получении колонок таблицы '{table_name}': {str(e)}"
             )
-
     @classmethod
     @DatabaseErrorHandler()
     def get_table_data(
