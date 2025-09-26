@@ -5,6 +5,8 @@ from frontend.shared.ui.ComboBox import ComboBoxClass
 from backend.repository import DatabaseRepository
 import logging
 
+from frontend.shared.ui.inputs import BoolInput, DateInput, FloatInput, IntInput, StringInput
+
 logger = logging.getLogger()
 database = DatabaseRepository()
 
@@ -63,70 +65,55 @@ class FilterBlockClass(QWidget):
 
         # 1. ENUM — выпадающий список
         if col_info.get("enum_values"):
-            combo = QComboBox()
-            combo.addItem("— не выбрано —", None)
-            for value in col_info["enum_values"]:
-                combo.addItem(str(value), value)
+            combo = ComboBoxClass()
+            combo.set_items(col_info["enum_values"])
             input_widget = combo
 
-        # # 2. FOREIGN KEY — выпадающий список с загрузкой данных
-        # elif col_info.get("foreign_keys"):
-        #     # Берём первую FK (обычно одна)
-        #     fk = col_info["foreign_keys"][0]
-        #     target_table = fk["target_table"]
-        #     target_column = fk["target_column"]
+        # 2. FOREIGN KEY — выпадающий список с загрузкой данных
+        elif col_info.get("foreign_keys"):
+            # Берём первую FK (обычно одна)
+            fk = col_info["foreign_keys"][0]
+            target_table = fk["target_table"]
+            target_column = fk["target_column"]
 
-        #     combo = ComboBox()
-        #     combo.addItem("— не выбрано —", None)
-        #     combo.setProperty("foreign_key", {"table": target_table, "column": target_column})
-        #     input_widget = combo
-
-        #     try:
-        #         # Пример: загружаем {id: ..., name: ...} из связанной таблицы
-        #         # Ты должен реализовать этот метод!
-        #         options = self._load_foreign_key_options(target_table)
-        #         for item in options:
-        #             display = item.get("name") or item.get("type") or str(item.get("id"))
-        #             combo.addItem(display, item["id"])
-        #     except Exception as e:
-        #         combo.addItem(f"Ошибка загрузки: {e}", None)
+            combo = ComboBoxClass()
+            combo.setProperty("foreign_key", {"table": target_table, "column": target_column})
+            input_widget = combo
+            logger.info(col_name)
+            logger.info(col_info["foreign_keys"])
+            # display = item.get("name") or item.get("type") or str(item.get("id"))
+            # combo.addItem(item.get("name") or item.get("type"), item["id"])
 
         # 3. Стандартные типы
         else:
             col_type_upper = (col_info.get("type") or "").upper()
 
-            if any(t in col_type_upper for t in ("TEXT", "VARCHAR", "CHAR", "STRING", "NAME", "FLAVOR", "LOCATION", "DESCRIPTION", "CLIENT", "TECHNICIAN", "RECOMMENDATION")):
-                edit = QLineEdit()
+            if any(t in col_type_upper for t in ("TEXT", "VARCHAR", "CHAR", "STRING")):
+                edit: QLineEdit = StringInput.StringInput()
                 edit.setPlaceholderText("введите текст...")
                 input_widget = edit
 
             elif any(t in col_type_upper for t in ("INTEGER", "BIGINT", "SERIAL")):
-                spin = QSpinBox()
-                spin.setRange(-9999999, 9999999)
-                spin.setSpecialValueText("— не задано —")
+                spin: QSpinBox = IntInput.IntInput()
                 input_widget = spin
 
             elif any(t in col_type_upper for t in ("NUMERIC", "DECIMAL", "FLOAT", "REAL")):
-                spin = QDoubleSpinBox()
-                spin.setRange(-9999999.99, 9999999.99)
+                spin: QDoubleSpinBox = FloatInput.FloatInput()
                 spin.setDecimals(2)
-                spin.setSpecialValueText("— не задано —")
                 input_widget = spin
 
             elif "BOOLEAN" in col_type_upper:
-                cb = QCheckBox()
+                cb: QCheckBox = QCheckBox()
                 input_widget = cb
 
             elif any(t in col_type_upper for t in ("DATE", "DATETIME", "TIMESTAMP")):
-                dt = QDateEdit()
+                dt: QDateEdit = DateInput.DateInput()
                 dt.setCalendarPopup(True)
-                dt.setSpecialValueText("— не задано —")
-                # Можно установить режим "без даты", но проще — использовать флаг
                 input_widget = dt
 
             else:
                 # Fallback
-                edit = QLineEdit()
+                edit: QLineEdit = StringInput.StringInput()
                 edit.setPlaceholderText(f"({col_info.get('type', 'unknown')})")
                 input_widget = edit
 

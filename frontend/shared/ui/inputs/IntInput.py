@@ -1,13 +1,13 @@
-from PySide6.QtWidgets import QDoubleSpinBox
+from PySide6.QtWidgets import QSpinBox
 from backend.utils.logger import logging
 from .GenericInput import GenericInput
 
 logger = logging.getLogger()
 
 
-class IntInput(GenericInput, QDoubleSpinBox):
+class IntInput(GenericInput, QSpinBox):
 
-    def __init__(self, min: float = -(10.0**10), max: float = 10.0**10, **kwargs):
+    def __init__(self, min: int = -(10**10), max: int = 10**10, **kwargs):
         super().__init__()
         if range:
             self.setRange(min, max)

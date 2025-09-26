@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QLineEdit, QCheckBox
 from .GenericInput import GenericInput
 
 
@@ -14,3 +14,10 @@ class BoolEdit(GenericInput, QLineEdit):
 
     def is_value_valid(self) -> bool:
         return super().is_value_valid(True)
+
+class BoolEditCheckBox(QCheckBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+    def get_value(self) -> bool:
+        return bool(self.isChecked())
