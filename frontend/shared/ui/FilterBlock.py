@@ -27,10 +27,6 @@ class FilterBlockClass(QWidget):
         self.hor_layout.addWidget(self.table_combo)
         self.hor_layout.addWidget(self.filters_container)
 
-        # Инициализация: если есть хотя бы одна таблица — подгрузим фильтры
-        if initial_tables:
-            self._on_table_changed(initial_tables[0])
-
     def _on_table_changed(self, table_name: str):
         """Обновляет фильтры под выбранную таблицу"""
         self.clear_filters()
