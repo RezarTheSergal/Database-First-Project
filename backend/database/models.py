@@ -3,12 +3,11 @@ from sqlalchemy import (
     ARRAY, Enum, ForeignKey, CheckConstraint, Text, 
     TIMESTAMP, BigInteger
 )
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-class Base(DeclarativeBase):
-    pass
+Base = declarative_base()
 
 # Определение типов ENUM
 equipment_status = Enum('working', 'maintenance', 'broken', name='equipment_status')
