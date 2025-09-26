@@ -1,21 +1,9 @@
-from PySide6.QtWidgets import QMainWindow, QWidget
-from backend.database.init_db import init_database
 from frontend.modals import AddEntryModal, ViewTableModal
 from frontend.utils.DBSetup import init_database_callback
-from frontend.shared.ui import (
-    PushButton,
-    VLayout,
-    Icon,
-    H1,
-    Hr,
-    Widget,
-)
+from frontend.shared.ui import PushButton, VLayout, Icon, H1, Hr, Widget, PromptBox
 from backend.settings import ICON_PATH
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
-
-NoButton = QMessageBox.StandardButton.No
-YesButton = QMessageBox.StandardButton.Yes
-
+from PySide6.QtWidgets import QMainWindow, QApplication
+from frontend.shared.ui.const import YesButton
 
 class MainWindow(QMainWindow):
 
@@ -55,14 +43,12 @@ class MainWindow(QMainWindow):
             [h1, hr, create_scheme_btn, add_entry_btn, view_table_btn]
         )
 
-    def closeEvent(self, event):
+    def _handle_close_event(self, event):
         """This method is automatically called when the window is about to close."""
-        reply = QMessageBox.question(
+        reply = PromptBox().prompt(
             self,
             "Подтвердить выход",
             "Вы точно хотите выйти из приложения? Любые несохраненные изменения будут утеряны.",
-            YesButton | NoButton,
-            NoButton,
         )
 
         if reply == YesButton:

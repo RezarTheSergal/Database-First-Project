@@ -5,8 +5,8 @@ from .inputs.DateInput import DateInput
 from .inputs.FloatInput import FloatInput
 from .Widget import Widget
 from .Layouts import HLayout
-from .Text import Text
-from .Font import Font
+from .text.Text import Text
+from .text.Font import Font
 from ..lib.utils import setClass
 
 font = Font(12)
