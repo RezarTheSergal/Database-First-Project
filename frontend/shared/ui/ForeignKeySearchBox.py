@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QComboBox
 from PySide6.QtCore import QTimer
 from backend.repository import DatabaseRepository
+from backend.utils.responce_types import ResponseStatus
 
 class ForeignKeySearchBox(QWidget):
     def __init__(self, target_table: str, display_column: str, id_column: str):
@@ -11,8 +12,9 @@ class ForeignKeySearchBox(QWidget):
 
         layout = QHBoxLayout()
         self.combo = QComboBox()
+        self.combo.setCompleter(None)
         self.combo.setEditable(True)
-        self.combo.setInsertPolicy(QComboBox.NoInsert)
+        self.combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         layout.addWidget(self.combo)
         self.setLayout(layout)
 
@@ -47,6 +49,19 @@ class ForeignKeySearchBox(QWidget):
         for item in results:
             self.combo.addItem(item[self.display_column], item[self.id_column])
         self.combo.blockSignals(False)
+
+    def on_focus(self):
+        if self.combo.count() == 0:
+            resp = DatabaseRepository.search_foreign_key(
+                table=self.target_table,
+                display_col=self.display_column,
+                id_col=self.id_column,
+                query="",  # пустой запрос → можно вернуть первые N
+                limit=10
+            )
+            if resp.status == ResponseStatus.SUCCESS:
+                for item in resp.data:
+                    self.combo.addItem(str(item["display"]), userData=item["id"])
 
     def _on_selection(self, index: int):
         if index >= 0:

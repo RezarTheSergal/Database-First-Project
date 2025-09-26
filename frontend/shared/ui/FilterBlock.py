@@ -1,11 +1,12 @@
-from typing import Any, Dict, List
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSpinBox, QCheckBox, QComboBox, QDateEdit, QDoubleSpinBox
-from frontend.shared.ui import VLayout, HLayout, Widget
+from typing import Any, Dict, List, Optional
+from PySide6.QtWidgets import QWidget, QHBoxLayout
+from backend.utils.responce_types import ResponseStatus
+from frontend.shared.ui import VLayout, Widget
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
+from frontend.shared.ui.filters.factory import FilterWidgetFactory
+from frontend.shared.ui.filters.base import BaseFilterWidget
 import logging
-
-from frontend.shared.ui.inputs import BoolInput, DateInput, FloatInput, IntInput, StringInput
 
 logger = logging.getLogger()
 database = DatabaseRepository()
@@ -13,140 +14,123 @@ database = DatabaseRepository()
 class FilterBlockClass(QWidget):
     def __init__(self, initial_tables=None, parent=None):
         super().__init__(parent)
-        self.hor_layout = QHBoxLayout(self)
-        self.hor_layout.setContentsMargins(0, 0, 0, 0)
-
+        
+        # Основной layout
+        self.main_layout = QHBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # ComboBox для выбора таблицы
         self.table_combo = ComboBox(
-            items=initial_tables or [], callback=self._on_table_changed
+            items=initial_tables or [], 
+            callback=self._on_table_changed
         )
-
+        self.table_combo.setMinimumWidth(150)
+        
+        # Контейнер для фильтров
         self.filters_container = Widget(VLayout())
-        self.filters_widgets = {}  # {column_name: widget}
-
-        self.hor_layout.addWidget(self.table_combo)
-        self.hor_layout.addWidget(self.filters_container)
-
+        
+        # Словарь для хранения виджетов фильтров
+        self.filter_widgets: Dict[str, BaseFilterWidget] = {}
+        
+        # Добавляем в layout
+        self.main_layout.addWidget(self.table_combo)
+        self.main_layout.addWidget(self.filters_container)
+    
     def _on_table_changed(self, table_name: str):
         """Обновляет фильтры под выбранную таблицу"""
         self.clear_filters()
+        
+        if not table_name:
+            return
+        
         columns_info = self._get_columns_info(table_name)
         if not columns_info:
+            logger.warning(f"Не удалось получить информацию о колонках для таблицы {table_name}")
             return
-
+        
+        # Создаем фильтры для каждой колонки
         for col_name, col_meta in columns_info.items():
-            logger.info(col_meta)
-            widget = self._create_filter_widget(col_name, col_meta)
-            if widget:
-                self.filters_widgets[col_name] = widget
-                self.filters_container.layout().addWidget(widget)
-
-    def _get_columns_info(self, table_name: str) -> Dict[str, dict]:
-        response = database.get_table_columns(table_name)
-        if response.status == "error" or response.data is None:
-            logger.error(f"Не удалось получить колонки для таблицы {table_name}: {response.error}")
-            return None
-        return response.data
-
-    def _create_filter_widget(self, col_name: str, col_info: Dict[str, Any]) -> QWidget:
-        """Создаёт виджет фильтра на основе полной информации о колонке."""
-        container = QWidget()
-        layout = HLayout()  # предполагается, что это QHBoxLayout или аналог
-        container.setLayout(layout)
-
-        label = QLabel(f"{col_name}:")
-        layout.addWidget(label)
-
-        input_widget = None
-
-        # 1. ENUM — выпадающий список
-        if col_info.get("enum_values"):
-            combo = ComboBox()
-            combo.set_items(col_info["enum_values"])
-            input_widget = combo
-
-        # 2. FOREIGN KEY — выпадающий список с загрузкой данных
-        elif col_info.get("foreign_keys"):
-            # Берём первую FK (обычно одна)
-            fk = col_info["foreign_keys"][0]
-            target_table = fk["target_table"]
-            target_column = fk["target_column"]
-
-            combo = ComboBox()
-            combo.setProperty("foreign_key", {"table": target_table, "column": target_column})
-            print(target_table, target_column)
-            response = DatabaseRepository().get_table_data(target_table, target_column)
-            logger.info(response)
-            input_widget = combo
-            logger.info(col_name)
-            logger.info(col_info["foreign_keys"])
-            # display = item.get("name") or item.get("type") or str(item.get("id"))
-            # combo.addItem(item.get("name") or item.get("type"), item["id"])
-
-        # 3. Стандартные типы
-        else:
-            col_type_upper = (col_info.get("type") or "").upper()
-
-            if any(t in col_type_upper for t in ("TEXT", "VARCHAR", "CHAR", "STRING")):
-                edit: QLineEdit = StringInput()
-                edit.setPlaceholderText("введите текст...")
-                input_widget = edit
-
-            elif any(t in col_type_upper for t in ("INTEGER", "BIGINT", "SERIAL")):
-                spin: QSpinBox = IntInput()
-                input_widget = spin
-
-            elif any(t in col_type_upper for t in ("NUMERIC", "DECIMAL", "FLOAT", "REAL")):
-                spin: QDoubleSpinBox = FloatInput()
-                spin.setDecimals(2)
-                input_widget = spin
-
-            elif "BOOLEAN" in col_type_upper:
-                cb: QCheckBox = QCheckBox()
-                input_widget = cb
-
-            elif any(t in col_type_upper for t in ("DATE", "DATETIME", "TIMESTAMP")):
-                dt: QDateEdit = DateInput()
-                dt.setCalendarPopup(True)
-                input_widget = dt
-
+            try:
+                filter_widget = FilterWidgetFactory.create_filter_widget(col_name, col_meta)
+                
+                if filter_widget:
+                    self.filter_widgets[col_name] = filter_widget
+                    self.filters_container.layout().addWidget(filter_widget)
+                    
+                    # Подключаем сигналы если нужно
+                    if hasattr(filter_widget, 'value_changed'):
+                        filter_widget.value_changed.connect(
+                            lambda value, col=col_name: self._on_filter_value_changed(col, value)
+                        )
+                        
+            except Exception as e:
+                logger.error(f"Ошибка создания фильтра для колонки {col_name}: {e}")
+    
+    def _get_columns_info(self, table_name: str) -> Optional[Dict[str, dict]]:
+        """Получает информацию о колонках таблицы"""
+        try:
+            response = database.get_table_columns(table_name)
+            
+            if response.status == ResponseStatus.SUCCESS and response.data:
+                return response.data
             else:
-                # Fallback
-                edit: QLineEdit = StringInput()
-                edit.setPlaceholderText(f"({col_info.get('type', 'unknown')})")
-                input_widget = edit
-
-        if input_widget is not None:
-            layout.addWidget(input_widget)
-            container.input_widget = input_widget  # для последующего get_filters()
-            container.col_info = col_info  # сохраняем метаданные
-
-        return container
-
+                logger.error(f"Ошибка получения колонок для таблицы {table_name}: {response.error}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Исключение при получении колонок для таблицы {table_name}: {e}")
+            return None
+    
+    def _on_filter_value_changed(self, column_name: str, value: Any):
+        """Обработчик изменения значения фильтра"""
+        logger.debug(f"Фильтр {column_name} изменен на: {value}")
+        # Здесь можно добавить логику для реакции на изменения фильтров
+        # Например, автоматическое обновление данных в таблице
+    
     def clear_filters(self):
         """Очищает все фильтры"""
-        while self.filters_container.layout().count():
-            child = self.filters_container.layout().takeAt(0)
+        # Удаляем все виджеты из layout
+        layout = self.filters_container.layout()
+        while layout.count():
+            child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-        self.filters_widgets.clear()
-
-    def get_filters(self) -> dict:
-        """Возвращает текущие значения фильтров в виде {col: value}"""
+        
+        # Очищаем словарь
+        self.filter_widgets.clear()
+    
+    def get_filters(self) -> Dict[str, Any]:
+        """
+        Возвращает текущие значения фильтров в виде {column_name: value}
+        Возвращает только непустые фильтры
+        """
         result = {}
-        for col, widget in self.filters_widgets.items():
-            if hasattr(widget, 'text'):
-                val = widget.text()
-            elif hasattr(widget, 'value'):
-                val = widget.value()
-            elif hasattr(widget, 'isChecked'):
-                val = widget.isChecked()
-            elif hasattr(widget, 'dateTime'):
-                val = widget.dateTime().toString("yyyy-MM-dd HH:mm:ss")
-            else:
-                val = None
-            if val not in (None, "", 0, False):  # можно настроить логику
-                result[col] = val
+        
+        for col_name, filter_widget in self.filter_widgets.items():
+            if not filter_widget.is_empty():
+                value = filter_widget.get_filter_value()
+                if value is not None:
+                    result[col_name] = value
+        
         return result
-
+    
     def get_selected_table(self) -> str:
+        """Возвращает имя выбранной таблицы"""
         return self.table_combo.currentText()
+    
+    def set_filter_value(self, column_name: str, value: Any, display_text: str = None):
+        """Программно устанавливает значение фильтра"""
+        if column_name in self.filter_widgets:
+            filter_widget = self.filter_widgets[column_name]
+            
+            # Для FK фильтров передаем дополнительную информацию
+            if hasattr(filter_widget, 'set_value'):
+                filter_widget.set_value(value, display_text)
+            else:
+                # Для простых фильтров (пока не реализовано)
+                pass
+
+    def reset_filters(self):
+        """Сбрасывает все фильтры в начальное состояние"""
+        for filter_widget in self.filter_widgets.values():
+            filter_widget.clear_value()
