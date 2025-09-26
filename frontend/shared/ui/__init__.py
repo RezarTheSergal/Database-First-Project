@@ -13,9 +13,8 @@ from .Spinner import Spinner
 from .Widget import Widget
 from .SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
-from .Row import Row
 from .inputs import StringInput
-from .ComboBox import ComboBoxClass
+from .inputs.ComboBox import ComboBox
 from .PromptBox import PromptBox
 
 __all__ = [
@@ -37,8 +36,7 @@ __all__ = [
     "SizeAdjustPolicy",
     "H1",
     "Hr",
-    "Row",
     "StringInput",
-    "ComboBoxClass",
+    "ComboBox",
     "PromptBox",
 ]

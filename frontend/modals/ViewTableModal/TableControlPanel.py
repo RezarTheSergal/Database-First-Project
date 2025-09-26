@@ -1,10 +1,14 @@
 from collections import defaultdict
-from os import getcwd
-from typing import Dict, List
+from typing import List
 from PySide6.QtWidgets import QWidget
 from backend.repository import DatabaseRepository
-from frontend.shared.ui import HLayout, PushButton, Icon, PushButton, Row, Widget, VLayout, HLayout
-from frontend.shared.ui.ComboBox import ComboBoxClass
+from frontend.shared.ui import (
+    PushButton,
+    PushButton,
+    Widget,
+    VLayout,
+)
+from frontend.shared.ui.inputs.ComboBox import ComboBox
 from frontend.shared.ui.FilterBlock import FilterBlockClass
 import logging
 from frontend.shared.lib import translate
@@ -45,5 +49,3 @@ class TableControlPanel(QWidget):
                 if filters:
                     result[table].update(filters)
         return dict(result)
-        
-

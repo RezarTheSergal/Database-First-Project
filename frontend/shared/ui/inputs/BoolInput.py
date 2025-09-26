@@ -1,16 +1,15 @@
 from PySide6.QtWidgets import QLineEdit
-from .GenericInput import GenericInput
+from .isNull import isNull
 
 
-class BoolEdit(GenericInput, QLineEdit):
+class BoolInput(QLineEdit):
+    is_nullable: bool
     ALLOWED_VALUES: list[str] = ["true", "false"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-        self.set_allowed_values(self.ALLOWED_VALUES)
 
     def get_value(self) -> bool:
         return bool(self.text())
 
     def is_value_valid(self) -> bool:
-        return super().is_value_valid(True)
+        if not self.is_nullable and isNull(self.text()):
+            return False
+        return True
