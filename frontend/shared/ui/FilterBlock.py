@@ -60,7 +60,7 @@ class FilterBlockClass(QWidget):
 
         # 1. ENUM — выпадающий список
         if col_info.get("enum_values"):
-            combo = ComboBoxClass()
+            combo = ComboBox()
             combo.set_items(col_info["enum_values"])
             input_widget = combo
 
@@ -71,8 +71,11 @@ class FilterBlockClass(QWidget):
             target_table = fk["target_table"]
             target_column = fk["target_column"]
 
-            combo = ComboBoxClass()
+            combo = ComboBox()
             combo.setProperty("foreign_key", {"table": target_table, "column": target_column})
+            print(target_table, target_column)
+            response = DatabaseRepository().get_table_data(target_table, target_column)
+            logger.info(response)
             input_widget = combo
             logger.info(col_name)
             logger.info(col_info["foreign_keys"])
@@ -84,16 +87,16 @@ class FilterBlockClass(QWidget):
             col_type_upper = (col_info.get("type") or "").upper()
 
             if any(t in col_type_upper for t in ("TEXT", "VARCHAR", "CHAR", "STRING")):
-                edit: QLineEdit = StringInput.StringInput()
+                edit: QLineEdit = StringInput()
                 edit.setPlaceholderText("введите текст...")
                 input_widget = edit
 
             elif any(t in col_type_upper for t in ("INTEGER", "BIGINT", "SERIAL")):
-                spin: QSpinBox = IntInput.IntInput()
+                spin: QSpinBox = IntInput()
                 input_widget = spin
 
             elif any(t in col_type_upper for t in ("NUMERIC", "DECIMAL", "FLOAT", "REAL")):
-                spin: QDoubleSpinBox = FloatInput.FloatInput()
+                spin: QDoubleSpinBox = FloatInput()
                 spin.setDecimals(2)
                 input_widget = spin
 
@@ -102,13 +105,13 @@ class FilterBlockClass(QWidget):
                 input_widget = cb
 
             elif any(t in col_type_upper for t in ("DATE", "DATETIME", "TIMESTAMP")):
-                dt: QDateEdit = DateInput.DateInput()
+                dt: QDateEdit = DateInput()
                 dt.setCalendarPopup(True)
                 input_widget = dt
 
             else:
                 # Fallback
-                edit: QLineEdit = StringInput.StringInput()
+                edit: QLineEdit = StringInput()
                 edit.setPlaceholderText(f"({col_info.get('type', 'unknown')})")
                 input_widget = edit
 
