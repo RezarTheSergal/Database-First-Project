@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSpinBox, QCheckBox, QComboBox, QDateEdit, QDoubleSpinBox
 from frontend.shared.ui import VLayout, HLayout, Widget
-from frontend.shared.ui.ComboBox import ComboBoxClass
+from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
 import logging
 
@@ -16,9 +16,8 @@ class FilterBlockClass(QWidget):
         self.hor_layout = QHBoxLayout(self)
         self.hor_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.table_combo = ComboBoxClass(
-            items=initial_tables or [],
-            callback=self._on_table_changed
+        self.table_combo = ComboBox(
+            items=initial_tables or [], callback=self._on_table_changed
         )
 
         self.filters_container = Widget(VLayout())

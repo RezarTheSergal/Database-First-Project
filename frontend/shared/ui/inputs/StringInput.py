@@ -1,15 +1,14 @@
 from PySide6.QtWidgets import QLineEdit
-from .GenericInput import GenericInput
+from .isNull import isNull
 
 
-class StringInput(GenericInput, QLineEdit):
-    def __init__(
-        self, allowed_values: list[str] | None = None, *args, **kwargs
-    ) -> None:
-        super().__init__()
-        self.setMaximumHeight(30)
-        if allowed_values is not None:
-            self.set_allowed_values(allowed_values)
+class StringInput(QLineEdit):
+    is_nullable: bool
+
+    def is_value_valid(self):
+        if not self.is_nullable and isNull(self.text()):
+            return False
+        return True
 
     def get_value(self) -> str:
         return self.text()

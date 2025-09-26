@@ -1,19 +1,22 @@
-from PySide6.QtWidgets import QSpinBox
+from PySide6.QtWidgets import QDoubleSpinBox
 from backend.utils.logger import logging
-from .GenericInput import GenericInput
+from .isNull import isNull
 
 logger = logging.getLogger()
 
 
-class IntInput(GenericInput, QSpinBox):
-
-    def __init__(self, min: int = -(10**9), max: int = 10**9, **kwargs):
-        super().__init__()
-        if range:
-            self.setRange(min, max)
+class IntInput(QDoubleSpinBox):
+    is_nullable: bool
+    can_be_negative: bool
+    min: float
+    max: float
 
     def get_value(self) -> int:
         return int(self.text())
 
     def is_value_valid(self):
-        return self.text().isdigit()  # isdigit() means 'is integer'
+        if not self.is_nullable and isNull(self.text()):
+            return False
+        elif not self.can_be_negative and int(self.text()) < 0:
+            return False
+        return True
