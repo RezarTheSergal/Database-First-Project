@@ -1,25 +1,18 @@
-TRANSLATIONS = {
-    "flavor": "Вкус",
-    "name": "Название",
-    "description": "Описание",
-    "localtion": "Место",
-    "unit": "Мера измерения",
-    "temperature": "Температура",
-    "noise": "Шум",
-    "pressure": "Давление",
-    "vibration": "Вибрация",
-    "type": "Тип",
-    "volume_ml": "Объем, мл",
-    "price": "Цена, руб.",
-    "ingredients": "Состав",
-    "value": "Значение",
-    "timestamp": "Точное время",
-    "location": "Место",
-    "install_date": "Дата установки",
-    "status": "Статус",
-    "last_service": "Дата последнего обслуживания",
-}
+import json
+from backend.settings import LOCALES_PATH
+from backend.utils.join_path import join_path
 
+ru = open(
+    join_path(LOCALES_PATH, "locales/ru.json").__str__(),
+    "r",
+    encoding="utf8",
+)
+
+translations = json.load(ru)
 
 def translate(value: str) -> str:
-    return TRANSLATIONS.get(value.lower(), value)
+    """
+    Возвращает перевод фразы с английского на русский.
+    Если перевода нет, возвращает фразу на английском.
+    """
+    return translations.get(value.lower(), value)
