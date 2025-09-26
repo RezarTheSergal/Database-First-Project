@@ -1,5 +1,6 @@
 from frontend.shared.ui import Spinner, Widget, PushButton, VLayout, Row, Size
-from backend.repository import DatabaseRepository, logging
+from backend.repository import DatabaseRepository
+import logging
 from frontend.shared.lib import translate
 
 logger = logging.getLogger()
@@ -30,6 +31,7 @@ class AddEntryForm(Widget):
         if response.status == "error" or response.data is None:
             logger.error("Колонки не были получены", response.error)
             return
+        
         print([x["type"] for x in response.data.values()])
         columns: dict[str, dict] = response.data
 

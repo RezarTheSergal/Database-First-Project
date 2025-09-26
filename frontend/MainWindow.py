@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QWidget
-from backend.database.init_db import init_database
 from frontend.modals import AddEntryModal, ViewTableModal
+from frontend.utils.DBSetup import init_database_callback
 from .shared.ui import PushButton, VLayout, Alignment, Icon, H1, Hr
 from backend.settings import ICON_PATH
 
@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         # Rezar: перенёс логику проверки на существование БД в бэк инициализации
         create_scheme_btn = PushButton(
             "создать схему и таблицы",
-            callback=init_database,
+            callback=init_database_callback,
         )
         add_entry_btn = PushButton(
             "внести данные",
