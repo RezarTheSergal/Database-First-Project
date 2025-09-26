@@ -7,7 +7,7 @@ logger = logging.getLogger()
 
 class IntInput(GenericInput, QSpinBox):
 
-    def __init__(self, min: int = -(10**10), max: int = 10**10, **kwargs):
+    def __init__(self, min: int = -(10**9), max: int = 10**9, **kwargs):
         super().__init__()
         if range:
             self.setRange(min, max)
