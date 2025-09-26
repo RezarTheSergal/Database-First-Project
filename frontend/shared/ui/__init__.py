@@ -14,7 +14,7 @@ from .Widget import Widget
 from .SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
 from .Row import Row
-from .StringInput import StringInput
+from .inputs import StringInput
 
 __all__ = [
     "PushButton",
