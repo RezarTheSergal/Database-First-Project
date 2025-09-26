@@ -1,4 +1,4 @@
-from frontend.shared.ui import Spinner, Widget, PushButton, VLayout, Row, Size
+from frontend.shared.ui import Spinner, Widget, PushButton, VLayout, Row
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.lib import translate
 from .const import allowed_values_per_type
