@@ -637,6 +637,85 @@ class DatabaseRepository:
 
     @classmethod
     @DatabaseErrorHandler()
+    def search_foreign_key(
+        cls,
+        table: str,
+        display_col: str,
+        id_col: str,
+        query: str,
+        limit: int = 30
+    ) -> DatabaseResponse:
+        """
+        Поиск записей в связанной таблице по частичному совпадению в display_col.
+        Возвращает список словарей: [{"id": ..., "display": ...}, ...]
+        """
+        if not isinstance(query, str) or not query.strip():
+            return DatabaseResponse.success(
+                data=[],
+                message="Пустой поисковый запрос"
+            )
+
+        # 1. Получаем модель таблицы
+        model_response = cls.get_model_by_tablename(table)
+        if model_response.status != ResponseStatus.SUCCESS:
+            return model_response
+        model = model_response.data
+
+        # 2. Проверяем существование колонок
+        columns_response = cls.get_table_columns(table)
+        if columns_response.status != ResponseStatus.SUCCESS:
+            return columns_response
+
+        columns_info = columns_response.data
+        if display_col not in columns_info:
+            return DatabaseResponse.error(
+                error_code=ErrorCode.COLUMN_NOT_FOUND,
+                message=f"Колонка для отображения '{display_col}' не найдена в таблице '{table}'"
+            )
+        if id_col not in columns_info:
+            return DatabaseResponse.error(
+                error_code=ErrorCode.COLUMN_NOT_FOUND,
+                message=f"Идентифицирующая колонка '{id_col}' не найдена в таблице '{table}'"
+            )
+
+        # 3. Строим безопасный запрос
+        try:
+            display_column = getattr(model, display_col)
+            id_column = getattr(model, id_col)
+
+            # Убираем потенциально опасные символы? Нет — используем параметризацию
+            # SQLAlchemy автоматически экранирует параметры
+            search_pattern = f"%{query.strip()}%"
+
+            with Database().get_db_session() as session:
+                stmt = (
+                    select(id_column, display_column)
+                    .where(display_column.ilike(search_pattern))
+                    .limit(limit)
+                )
+                result = session.execute(stmt)
+                rows = result.fetchall()
+
+                # Формируем результат: список словарей
+                data = [
+                    {"id": row[0], "display": str(row[1]) if row[1] is not None else ""}
+                    for row in rows
+                ]
+
+                return DatabaseResponse.success(
+                    data=data,
+                    message=f"Найдено {len(data)} совпадений в таблице '{table}'"
+                )
+
+        except Exception as e:
+            return DatabaseErrorHandler.handle_exception(
+                e,
+                f"search_foreign_key(table={table}, display_col={display_col}, id_col={id_col}, query={query})"
+            )
+
+
+    @classmethod
+    @DatabaseErrorHandler()
     def insert_into_table(cls, table_name: str, params: Dict[str, Any]) -> DatabaseResponse:
         """Вставка значений в таблицу"""
 
@@ -846,4 +925,3 @@ class DatabaseRepository:
         except Exception as e:
             logger.error(f"Ошибка при удалении из таблицы '{table_name}': {str(e)}")
             return DatabaseErrorHandler.handle_exception(e, f"delete_from_table for {table_name}")
-
