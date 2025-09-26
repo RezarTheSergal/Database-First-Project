@@ -1,6 +1,6 @@
 from backend.utils.logger import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger("frontend")
 
 
 def get_allowed_values(table: str, name: str) -> list[str]:

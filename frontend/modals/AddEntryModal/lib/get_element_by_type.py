@@ -29,12 +29,12 @@ def isBoolType(type: str) -> bool:
 
 
 def get_element_by_type(type: str):
-    if isIntType(type):
+    if isArrayType(type):
+        return ComboBox()
+    elif isIntType(type):
         return IntInput()
     elif isFloatType(type):
         return FloatInput()
-    elif isArrayType(type):
-        return ComboBox([])
     elif isDateType(type):
         return DateInput()
     elif isBoolType(type):

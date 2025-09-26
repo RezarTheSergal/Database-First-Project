@@ -1,9 +1,5 @@
 from PySide6.QtWidgets import QDoubleSpinBox
-from backend.utils.logger import logging
 from .isNull import isNull
-
-logger = logging.getLogger()
-
 
 class IntInput(QDoubleSpinBox):
     is_nullable: bool

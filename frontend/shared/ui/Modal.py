@@ -3,10 +3,8 @@ from .Icon import Icon
 from .Layouts import GridLayout
 from .Widget import Widget
 from .const import DEFAULT_MAX_SIZE
-from ..lib.utils import setClass
-from os import getcwd
-
-ICON_PATH = getcwd() + "/frontend/images/favicon.ico"
+from backend.settings import ICON_PATH
+from frontend.shared.lib.utils import setClass
 
 
 class Modal(Widget):

@@ -3,9 +3,9 @@ from PySide6.QtWidgets import QComboBox
 
 
 class ComboBox(QComboBox):
-    items: Sequence[str]
+    items: Sequence[str] | None = None
 
-    def __init__(self, items: Sequence[str], callback=None):
+    def __init__(self, items: Sequence[str] | None = None, callback=None):
         super().__init__()
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         if items:
@@ -18,9 +18,5 @@ class ComboBox(QComboBox):
         self.addItem("— не выбрано —", None)
         self.addItems(items)
 
-    def get_current_item_text(self) -> str:
-        return self.currentText()
-
     def get_value(self) -> str:
-        """Элиас для `obj.get_current_item_text()`"""
-        return self.get_current_item_text()
+        return self.currentText()

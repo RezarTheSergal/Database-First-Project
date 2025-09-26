@@ -3,19 +3,11 @@ from frontend.shared.ui import ComboBox, Widget, PushButton, VLayout
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.lib import translate
-from .lib.utils import get_element_by_type
-from .lib.get_allowed_values import get_allowed_values
+from .lib import get_allowed_values, got_columns, get_element_by_type, is_foreign_key
+from pprint import pprint
 
 logger = logging.getLogger("frontend")
 database = DatabaseRepository()
-
-
-def got_columns(response: DatabaseResponse) -> bool:
-    return (
-        response.status == "error"
-        or response.data is None
-        or response.data.values() is None
-    )
 
 
 class AddEntryForm(Widget):
@@ -33,11 +25,11 @@ class AddEntryForm(Widget):
         )
 
     def _set_inputs_by_table(self):
-        if not self.table_name_combo_box.get_current_item_text():
+        if not self.table_name_combo_box.get_value():
             return
 
         response: DatabaseResponse = database.get_table_columns(
-            self.table_name_combo_box.get_current_item_text()
+            self.table_name_combo_box.get_value()
         )
 
         if got_columns(response):
@@ -48,6 +40,7 @@ class AddEntryForm(Widget):
             self.inputs_container.clean()
 
         columns: dict = response.data  # type: ignore
+        pprint(columns)
         self._setup_form_rows(columns)
 
     def _request_entry_PUT(self):
@@ -66,19 +59,22 @@ class AddEntryForm(Widget):
 
                 data[label_text] = input.get_value()
 
-        table_name = self.table_name_combo_box.get_current_item_text()
+        table_name = self.table_name_combo_box.get_value()
         database.insert_into_table(table_name, data)
 
     def _setup_form_rows(self, columns: dict):
         rows = []
-        table = self.table_name_combo_box.get_current_item_text()
+        table = self.table_name_combo_box.get_value()
 
         for [key, data] in columns.items():
-            if data["primary_key"] == True or key.lower().endswith("_id"):
+            if data["primary_key"] == True:
                 continue
 
             name = data["name"]
-            input = get_element_by_type(data["type"])
+            if is_foreign_key(data["name"]):
+                input = ComboBox()
+            else:
+                input = get_element_by_type(data["type"])
 
             if not isinstance(input, ComboBox):
                 input.is_nullable = data["nullable"]
