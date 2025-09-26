@@ -9,7 +9,7 @@ class Spinner(QListWidget):
         super().__init__()
         self.set_items(items)
         self.setSizeAdjustPolicy(SizeAdjustPolicy.AdjustToContents)
-        if callback is not None:
+        if callback != None:
             self.currentItemChanged.connect(callback)
 
     def set_items(self, items: Sequence[str]) -> None:

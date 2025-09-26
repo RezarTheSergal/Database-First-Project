@@ -16,24 +16,24 @@ class Widget(QWidget):
 
     def __init__(self, layout: HLayout | VLayout | GridLayout):
         super().__init__()
-        if layout is not None:
+        if layout != None:
             self._layout = layout
             self.setLayout(self._layout)
 
     def add_children(self, children: list[QWidget]):
-        if self._layout is not None:
+        if self._layout != None:
             self._layout.add_children(children)
         else:
             announce_missing_layout()
 
     def set_children(self, children: list[QWidget]):
-        if self._layout is not None:
+        if self._layout != None:
             self._layout.set_children(children)
         else:
             announce_missing_layout()
 
     def clean(self):
-        if self._layout is not None:
+        if self._layout != None:
             self._layout.clean()
         else:
             announce_missing_layout()

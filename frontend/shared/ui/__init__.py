@@ -16,6 +16,7 @@ from .Hr import Hr
 from .inputs import StringInput
 from .inputs.ComboBox import ComboBox
 from .PromptBox import PromptBox
+from .Completer import Completer
 
 __all__ = [
     "PushButton",
@@ -39,4 +40,5 @@ __all__ = [
     "StringInput",
     "ComboBox",
     "PromptBox",
+    "Completer",
 ]

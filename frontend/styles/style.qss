@@ -17,7 +17,7 @@
   color: #0ffa4a;
 }
 
-QMessageBox, QListWidget, QLineEdit, QTextEdit, QDateEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+QMessageBox, QListWidget, QLineEdit, QTextEdit, QDateEdit, QSpinBox, QDoubleSpinBox, QComboBox,QTableWidget {
   background-color: rgb(22, 22, 22);
 }
 

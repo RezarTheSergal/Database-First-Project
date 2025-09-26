@@ -11,7 +11,7 @@ class ComboBox(QComboBox):
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         if items:
             self.set_items(items)
-        if callback is not None:
+        if callback != None:
             self.currentTextChanged.connect(callback)
 
     def set_items(self, items: Sequence[str]) -> None:
