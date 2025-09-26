@@ -4,6 +4,7 @@ from frontend.shared.ui import Modal, Size, VLayout
 
 
 class ViewTableModal(Modal):
-    def __init__(self):
-        super().__init__(title="Просмотр таблиц", max_size=Size(800, 600), x=200)
+
+    def __init__(self, parent):
+        super().__init__(parent, title="Просмотр таблиц", max_size=Size(800, 600))
         self.add_children([TableControlPanel(), Table()])
