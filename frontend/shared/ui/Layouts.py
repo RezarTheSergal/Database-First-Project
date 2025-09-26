@@ -7,6 +7,7 @@ def add_children(layout: QLayout, children: Children):
     for child in children:
         layout.addWidget(child)
 
+
 def clean(layout: QLayout):
     if layout is not None:
         for child in layout.children():
