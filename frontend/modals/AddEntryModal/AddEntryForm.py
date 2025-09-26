@@ -1,4 +1,4 @@
-from frontend.shared.ui import Spinner, Widget, PushButton, VLayout, Row
+from frontend.shared.ui import ComboBoxClass, Widget, PushButton, VLayout, Row
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.lib import translate
 from .const import allowed_values_per_type
@@ -19,22 +19,22 @@ class AddEntryForm(Widget):
     def __init__(self):
         super().__init__(layout=VLayout())
 
-        self.table_name_spinner_box = Spinner(
-            database.get_tablenames().data, callback=self._set_inputs_by_table  # type: ignore
+        self.table_name_combo_box = ComboBoxClass(
+            items=database.get_tablenames().data, callback=self._set_inputs_by_table  # type: ignore
         )
         self.inputs_container = Widget(VLayout())
         self.submit_button = PushButton("Подтвердить", callback=self._request_entry_PUT)
 
         self.set_children(
-            [self.table_name_spinner_box, self.inputs_container, self.submit_button]
+            [self.table_name_combo_box, self.inputs_container, self.submit_button]
         )
 
     def _set_inputs_by_table(self):
-        if not self.table_name_spinner_box.get_current_item_text():
+        if not self.table_name_combo_box.get_current_item_text():
             return
 
         response: DatabaseResponse = database.get_table_columns(
-            self.table_name_spinner_box.get_current_item_text()
+            self.table_name_combo_box.get_current_item_text()
         )
 
         if got_columns(response):
@@ -63,7 +63,7 @@ class AddEntryForm(Widget):
 
                 data[input_label] = input.get_value()
 
-        table_name = self.table_name_spinner_box.get_current_item_text()
+        table_name = self.table_name_combo_box.get_current_item_text()
         database.insert_into_table(table_name, data)
 
     def _setup_form_rows(self, columns: dict):

@@ -14,3 +14,6 @@ class ComboBoxClass(QComboBox):
     def set_items(self, items: Sequence[str]) -> None:
         self.clear()
         self.addItems(items)
+
+    def get_current_item_text(self) -> str:
+        return self.currentText()

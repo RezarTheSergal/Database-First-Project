@@ -15,6 +15,7 @@ from .SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
 from .Row import Row
 from .inputs import StringInput
+from .ComboBox import ComboBoxClass
 
 __all__ = [
     "PushButton",
@@ -37,4 +38,5 @@ __all__ = [
     "Hr",
     "Row",
     "StringInput",
+    "ComboBoxClass",
 ]
