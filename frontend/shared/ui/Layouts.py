@@ -12,6 +12,7 @@ def clean(layout: QLayout):
         for child in layout.children():
             child.deleteLater()
 
+
 class VLayout(QVBoxLayout):
 
     def __init__(
