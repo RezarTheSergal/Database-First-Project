@@ -7,9 +7,9 @@ from frontend.shared.ui.const import YesButton
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, w=550, h=420):
+    def __init__(self):
         super().__init__()
-        self.setFixedSize(w, h)
+        self.setFixedSize(550, 420)
         self.setWindowIcon(Icon(ICON_PATH))
         self.setWindowTitle("Monster Energy Factory - Admin Panel")
         self.activateWindow()  # Puts window on top
@@ -43,7 +43,8 @@ class MainWindow(QMainWindow):
             [h1, hr, create_scheme_btn, add_entry_btn, view_table_btn]
         )
 
-    def _handle_close_event(self, event):
+    # НЕ ПЕРЕИМЕНОВЫВАТЬ
+    def closeEvent(self, event):
         """This method is automatically called when the window is about to close."""
         reply = PromptBox().prompt(
             self,
