@@ -132,7 +132,7 @@ class DatabaseRepository:
     def get_table_data(
         cls,
         table_name: str,
-        columns_list: Optional[List[str]] = None,
+        columns_list: Optional[List[str]] = [],
         filters_dict: Optional[Dict[str, Any]] = None,
         order_by: Optional[Dict[str, str]] = None,
         limit: Optional[int] = None,
@@ -151,17 +151,12 @@ class DatabaseRepository:
         columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
+        
+        if type(columns_list) != list:
+            columns_list = [columns_list]
 
         # Проверяем запрашиваемые колонки
         if columns_list:
-            invalid_columns = set(columns_response.data.keys()).difference(columns_list)
-            if invalid_columns:
-                return DatabaseResponse.error(
-                    ErrorCode.COLUMN_NOT_FOUND,
-                    f"Колонки не найдены: {', '.join(invalid_columns)}",
-                    error_details={"invalid_columns": list(invalid_columns)}
-                )
-
             select_columns = [getattr(model, column) for column in columns_list]
         else:
             select_columns = [model]
