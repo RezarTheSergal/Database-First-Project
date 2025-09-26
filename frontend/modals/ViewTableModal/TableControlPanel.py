@@ -3,7 +3,7 @@ from os import getcwd
 from typing import Dict, List
 from PySide6.QtWidgets import QWidget
 from backend.repository import DatabaseRepository
-from frontend.shared.ui import HLayout, PushButton, Icon, PushButton, Row, Widget, VLayout
+from frontend.shared.ui import HLayout, PushButton, Icon, PushButton, Row, Widget, VLayout, HLayout
 from frontend.shared.ui.ComboBox import ComboBoxClass
 from frontend.shared.ui.FilterBlock import FilterBlockClass
 import logging
@@ -19,19 +19,15 @@ class TableControlPanel(QWidget):
 
         table_names = database.get_tablenames().data or []
 
-        # Основной layout
         main_layout = VLayout()
         self.setLayout(main_layout)
 
-        # Контейнер для блоков
         self.blocks_container = Widget(VLayout())
         main_layout.addWidget(self.blocks_container)
 
-        # Кнопка добавления
         self.add_button = PushButton(text="➕", callback=self._add_filter_block)
         main_layout.addWidget(self.add_button)
 
-        # Добавляем первый блок сразу
         self._add_filter_block(initial_tables=table_names)
 
     def _add_filter_block(self, initial_tables=None):
