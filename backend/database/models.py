@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Date, Float, Numeric, 
-    ARRAY, Enum, ForeignKey, CheckConstraint, Text, 
+    ARRAY, Enum as SQLEnum, ForeignKey, CheckConstraint, Text, 
     TIMESTAMP, BigInteger
 )
 from sqlalchemy.orm import DeclarativeBase
@@ -11,10 +11,10 @@ class Base(DeclarativeBase):
     pass
 
 # Определение типов ENUM
-equipment_status = Enum('working', 'maintenance', 'broken', name='equipment_status')
-sensor_type = Enum('temperature', 'vibration', 'pressure', 'noise', name='sensor_type')
-maintenance_type = Enum('planned', 'emergency', 'predictive', name='maintenance_type')
-risk_level = Enum('low', 'medium', 'high', name='risk_level')
+equipment_status = SQLEnum('working', 'maintenance', 'broken', name='equipment_status')
+sensor_type = SQLEnum('temperature', 'vibration', 'pressure', 'noise', name='sensor_type')
+maintenance_type = SQLEnum('planned', 'emergency', 'predictive', name='maintenance_type')
+risk_level = SQLEnum('low', 'medium', 'high', name='risk_level')
 
 # Таблица оборудования
 class Equipment(Base):

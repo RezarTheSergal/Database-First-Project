@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QDoubleSpinBox
+from PySide6.QtWidgets import QSpinBox
 from .isNull import isNull
 
-class IntInput(QDoubleSpinBox):
+class IntInput(QSpinBox):
     is_nullable: bool
     can_be_negative: bool
     min: float

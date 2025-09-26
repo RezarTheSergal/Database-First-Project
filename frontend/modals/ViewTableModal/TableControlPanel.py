@@ -3,12 +3,15 @@ from typing import List, Dict, Any
 from PySide6.QtWidgets import QWidget, QScrollArea
 from PySide6.QtCore import Signal, Qt
 from backend.repository import DatabaseRepository
-from backend.utils.responce_types import ResponseStatus
+from backend.utils.responce_types import DatabaseResponse, ResponseStatus
+from frontend.modals.ViewTableModal.Table import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
 from frontend.shared.ui.FilterBlock import FilterBlockClass
 import logging
 
-logger = logging.getLogger()
+from frontend.utils.MessageFactory import MessageFactory
+
+logger = logging.getLogger(__name__)
 database = DatabaseRepository()
 
 class TableControlPanel(QWidget):
@@ -65,19 +68,27 @@ class TableControlPanel(QWidget):
         scroll_area.setWidget(self.blocks_container)
         
         main_layout.addWidget(scroll_area)
+
+        self.table_widget = DynamicTable()
+        self.table_widget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.table_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        main_layout.addWidget(self.table_widget)
     
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""
-        try:
-            response = database.get_tablenames()
-            if response.status == ResponseStatus.SUCCESS and response.data:
-                self.table_names = response.data
-                logger.info(f"Загружено {len(self.table_names)} таблиц")
-            else:
-                logger.error(f"Ошибка загрузки таблиц: {response.error}")
-                self.table_names = []
-        except Exception as e:
-            logger.error(f"Исключение при загрузке таблиц: {e}")
+        response = database.get_tablenames()
+        MessageFactory.show_response_message(response, self, True)
+        if response.status == ResponseStatus.SUCCESS and response.data:
+            self.table_names = response.data
+            logger.info(f"Загружено {len(self.table_names)} таблиц")
+        else:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка загрузки таблиц: {response.error}"
+                        ), 
+                        self
+                    )
+            logger.error(f"Ошибка загрузки таблиц: {response.error}")
             self.table_names = []
     
     def _add_initial_filter_block(self):
@@ -112,6 +123,12 @@ class TableControlPanel(QWidget):
             logger.info(f"Добавлен блок фильтров #{len(self.blocks)}")
             
         except Exception as e:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка добавления блока фильтров: {e}"
+                        ), 
+                        self
+                    )
             logger.error(f"Ошибка добавления блока фильтров: {e}")
     
     def _remove_filter_block(self, block: FilterBlockClass, container: QWidget):
@@ -131,6 +148,12 @@ class TableControlPanel(QWidget):
             self._apply_filters()
             
         except Exception as e:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка удаления блока фильтров: {e}"
+                        ), 
+                        self
+                    )
             logger.error(f"Ошибка удаления блока фильтров: {e}")
     
     def _clear_all_filters(self):
@@ -143,16 +166,29 @@ class TableControlPanel(QWidget):
             self._apply_filters()
             
         except Exception as e:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка очистки фильтров: {e}"
+                        ), 
+                        self
+                    )
             logger.error(f"Ошибка очистки фильтров: {e}")
     
     def _apply_filters(self):
         """Применяет текущие фильтры и отправляет сигнал"""
         try:
             filters = self.get_all_filters()
+            self.table_widget.set_model(self.blocks[0].get_selected_table())
             self.filters_changed.emit(filters)
             logger.info(f"Применены фильтры: {filters}")
             
         except Exception as e:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка применения фильтров: {e}"
+                        ), 
+                        self
+                    )
             logger.error(f"Ошибка применения фильтров: {e}")
     
     def get_all_filters(self) -> Dict[str, Dict[str, Any]]:
@@ -215,6 +251,12 @@ class TableControlPanel(QWidget):
             logger.info(f"Установлены фильтры: {filters_dict}")
             
         except Exception as e:
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Ошибка установки фильтров: {e}"
+                        ), 
+                        self
+                    )
             logger.error(f"Ошибка установки фильтров: {e}")
     
     def get_active_tables(self) -> List[str]:

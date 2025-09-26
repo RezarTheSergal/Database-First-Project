@@ -1,12 +1,14 @@
+from backend.utils.responce_types import ResponseStatus
 from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import ComboBox, Widget, PushButton, VLayout
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.lib import translate
+from frontend.utils.MessageFactory import MessageFactory
 from .lib import get_allowed_values, got_columns, get_element_by_type, is_foreign_key
 from pprint import pprint
 
-logger = logging.getLogger("frontend")
+logger = logging.getLogger(__name__)
 database = DatabaseRepository()
 
 
@@ -32,7 +34,15 @@ class AddEntryForm(Widget):
             self.table_name_combo_box.get_value()
         )
 
+        MessageFactory.show_response_message(response, self, True)
+
         if got_columns(response):
+            MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Колонки не были получены {response.error}"
+                        ), 
+                        self
+                    )
             logger.error("Колонки не были получены", response.error)
             return
         else:
@@ -52,6 +62,12 @@ class AddEntryForm(Widget):
                 input = child.input
 
                 if not isinstance(input, ComboBox) and not input.is_value_valid():
+                    MessageFactory._show_error(DatabaseResponse(
+                        status=ResponseStatus.ERROR, 
+                        message=f"Предоставленное значение {label_text} инвалидно! (Внести: '{input.text()}')"
+                        ), 
+                        self
+                    )
                     logger.error(
                         f"Given value of {label_text} is invalid! (input: '{input.text()}')"
                     )
@@ -60,7 +76,8 @@ class AddEntryForm(Widget):
                 data[label_text] = input.get_value()
 
         table_name = self.table_name_combo_box.get_value()
-        database.insert_into_table(table_name, data)
+        insert_responce = database.insert_into_table(table_name, data)
+        MessageFactory.show_response_message(insert_responce, self, True)
 
     def _setup_form_rows(self, columns: dict):
         rows = []
