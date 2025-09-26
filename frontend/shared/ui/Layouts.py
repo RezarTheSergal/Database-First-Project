@@ -7,11 +7,24 @@ def add_children(layout: QLayout, children: Children):
     for child in children:
         layout.addWidget(child)
 
-
 def clean(layout: QLayout):
-    if layout is not None:
-        for child in layout.children():
-            child.deleteLater()
+    """Удаляет всех детей из QLayout"""
+    if layout is None:
+        return
+
+    while layout.count():
+        child = layout.takeAt(0)
+        if child is None:  # Add this crucial check
+            continue
+
+        isLayout = child.layout() is not None
+        if isLayout:
+            clean(child.layout())
+        else:
+            widget = child.widget()
+            if widget is not None:  # Store widget reference to avoid multiple calls
+                widget.setParent(None)
+                widget.deleteLater()
 
 
 class VLayout(QVBoxLayout):
