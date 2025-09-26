@@ -8,6 +8,7 @@ from frontend.modals.ViewTableModal.Table import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
 from frontend.shared.ui.FilterBlock import FilterBlockClass
 import logging
+from backend.database.models import Base
 
 from frontend.utils.MessageFactory import MessageFactory
 
@@ -16,9 +17,6 @@ database = DatabaseRepository()
 
 class TableControlPanel(QWidget):
     """Панель управления фильтрами для таблиц с поддержкой множественных блоков"""
-    
-    # Сигналы для уведомления об изменениях
-    filters_changed = Signal(dict)  # {table_name: {col: value, ...}, ...}
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -178,8 +176,30 @@ class TableControlPanel(QWidget):
         """Применяет текущие фильтры и отправляет сигнал"""
         try:
             filters = self.get_all_filters()
-            self.table_widget.set_model(self.blocks[0].get_selected_table())
-            self.filters_changed.emit(filters)
+            table_name: str = self.blocks[0].get_selected_table()
+            response_teble_columns = DatabaseRepository().get_table_columns(table_name)
+            if MessageFactory.show_response_message(response_teble_columns, self, True):
+                logger.error(f"Ошибка получения колонок: {response_teble_columns.error}")
+                return
+            
+            table_columns: Dict[str, Dict[str, Any]] = response_teble_columns.data
+
+            response_model = DatabaseRepository().get_model_by_tablename(table_name)
+            if MessageFactory.show_response_message(response_model, self, True):
+                logger.error(f"Ошибка получения модели бд: {response_model.error}")
+                return
+            
+            model: type[Base] = response_model.data
+            print(filters, sep="\n\n")
+            response_table_data = DatabaseRepository().get_table_data(table_name, table_columns, filters.get(table_name, ""))
+            if MessageFactory.show_response_message(response_table_data, self, True):
+                logger.error(f"Ошибка получения данных таблицы: {response_table_data.error}")
+                return
+            
+            table_data: Dict[str, Any] = response_table_data.data
+
+            self.table_widget.set_model(model)
+            self.table_widget.load_data([table_data])
             logger.info(f"Применены фильтры: {filters}")
             
         except Exception as e:

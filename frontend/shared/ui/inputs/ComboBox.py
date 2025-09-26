@@ -16,7 +16,7 @@ class ComboBox(QComboBox):
 
     def set_items(self, items: Sequence[str]) -> None:
         self.clear()
-        self.addItem("— не выбрано —", None)
+        self.addItem("--не выбрано--", None)
         self.addItems(items)
 
     def get_value(self) -> str:

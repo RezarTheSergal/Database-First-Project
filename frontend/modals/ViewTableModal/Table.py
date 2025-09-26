@@ -27,7 +27,7 @@ class DynamicTable(QTableWidget):
 
     def __init__(self, model_class: Optional[type[DeclarativeBase]] = None):
         super().__init__()
-        self.setMaximumSize(Size(1200, 600))
+        self.setMaximumSize(Size(1800, 900))
         self.setSizeAdjustPolicy(SizeAdjustPolicy.AdjustToContents)
         self.setSortingEnabled(True)
         
@@ -110,7 +110,7 @@ class DynamicTable(QTableWidget):
         """Загружает данные в таблицу"""
         self.setRowCount(len(data))
         columns = list(self._column_info.keys())
-        
+        print(data)
         for row_idx, row_data in enumerate(data):
             for col_idx, col_name in enumerate(columns):
                 value = row_data.get(col_name)

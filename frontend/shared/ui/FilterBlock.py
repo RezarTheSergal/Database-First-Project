@@ -109,7 +109,7 @@ class FilterBlockClass(QWidget):
         for col_name, filter_widget in self.filter_widgets.items():
             if not filter_widget.is_empty():
                 value = filter_widget.get_filter_value()
-                if value is not None:
+                if value is not None or value != "" or value != "--не выбрано--" :
                     result[col_name] = value
         
         return result

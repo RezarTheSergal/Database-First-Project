@@ -5,14 +5,17 @@ class MessageFactory:
     """Фабрика для показа сообщений пользователю"""
     
     @staticmethod
-    def show_response_message(response: DatabaseResponse, parent: QWidget, is_modal: bool = False):
+    def show_response_message(response: DatabaseResponse, parent: QWidget, is_modal: bool = False) -> bool:
         """Показывает сообщение в зависимости от статуса ответа"""
         if response.status == ResponseStatus.ERROR:
             MessageFactory._show_error(response, parent)
+            return True
         elif response.status == ResponseStatus.WARNING:
             MessageFactory._show_warning(response, parent)
+            return False
         elif response.status == ResponseStatus.SUCCESS and not is_modal:
             MessageFactory._show_success(response, parent)
+            return False
     
     @staticmethod
     def _show_error(response: DatabaseResponse, parent: QWidget):
