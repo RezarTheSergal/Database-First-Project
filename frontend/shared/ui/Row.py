@@ -1,8 +1,8 @@
-from .StringInput import StringInput
-from .BoolInput import BoolEdit
-from .IntInput import IntInput
-from .DateInput import DateInput
-from .FloatInput import FloatInput
+from .inputs.StringInput import StringInput
+from .inputs.BoolInput import BoolEdit
+from .inputs.IntInput import IntInput
+from .inputs.DateInput import DateInput
+from .inputs.FloatInput import FloatInput
 from .Widget import Widget
 from .Layouts import HLayout
 from .Text import Text
@@ -16,37 +16,46 @@ def isIntType(type: str) -> bool:
     return type == "INTEGER" or "NUMERIC" in type
 
 
-def return_element_by_type(type: str, *args, **kwargs):
+def return_element_by_type(type: str, **kwargs):
     if isIntType(type):
-        return IntInput(*args, **kwargs)
+        return IntInput(**kwargs)
 
     match (type):
         case "TEXT":
-            return StringInput(*args, **kwargs)
-        case "FLOAT":
-            return FloatInput(*args, **kwargs)
+            return StringInput(**kwargs)
+        case "FLOAT" | "DOUBLE":
+            return FloatInput(**kwargs)
         case "BOOL" | "BOOLEAN":
-            return BoolEdit(*args, **kwargs)
+            return BoolEdit(**kwargs)
         case "DATE":
-            return DateInput(*args, **kwargs)
+            return DateInput(**kwargs)
         case _:
-            return StringInput(*args, **kwargs)
+            return StringInput(**kwargs)
 
 
 class Row(Widget):
     _layout = HLayout()
 
-    def __init__(self, en_label: str, ru_label: str, type: str, placeholder: str = ""):
-        super().__init__()
+    def __init__(
+        self,
+        en_label: str,
+        ru_label: str,
+        type: str,
+        placeholder: str = "",
+        allowed_values: list | None = None,
+    ):
+        super().__init__(HLayout())
         self.en_label = en_label
         self.ru_label = ru_label
         self.setLayout(self._layout)
 
         setClass(self, "row")
         self.label = Text(ru_label, font=font)
-        self.input = return_element_by_type(type, placeholder)
+        self.input = return_element_by_type(
+            type=type, placeholder=placeholder, allowed_values=allowed_values
+        )
 
-        self.add_children([self.label, self.input])
+        self.set_children([self.label, self.input])
 
     def get_label(self, locale: str) -> str:
         if locale == "en":

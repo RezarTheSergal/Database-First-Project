@@ -1,8 +1,10 @@
 class GenericInput:
+    allowed_values = None
+
     def set_allowed_values(self, values: list):
         self.allowed_values = values
 
-    def is_value_valid(self, is_case_sensitive: bool) -> bool:
+    def is_value_valid(self, is_case_sensitive: bool = True) -> bool:
         value = self.get_value()
 
         if self.allowed_values is None:

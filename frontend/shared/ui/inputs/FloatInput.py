@@ -10,3 +10,6 @@ class FloatInput(GenericInput, QDoubleSpinBox):
 
     def get_value(self) -> float:
         return float(self.text())
+
+    def is_value_valid(self) -> bool:
+        return self.text().isdecimal()
