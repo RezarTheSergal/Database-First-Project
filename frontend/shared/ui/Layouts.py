@@ -7,16 +7,10 @@ def add_children(layout: QLayout, children: Children):
     for child in children:
         layout.addWidget(child)
 
-
 def clean(layout: QLayout):
     if layout is not None:
-        for i in reversed(range(layout.count())):
-            child = layout.takeAt(i)
-            if child.widget() is not None:
-                child.widget().deleteLater()
-            elif child.layout() is not None:
-                clean(child.layout())  # Clear nested layout
-
+        for child in layout.children():
+            child.deleteLater()
 
 class VLayout(QVBoxLayout):
 
@@ -30,6 +24,10 @@ class VLayout(QVBoxLayout):
             self.setAlignment(alignment)
         if children:
             self.add_children(children)
+
+    def set_children(self, children: Children):
+        self.clean()
+        self.add_children(children)
 
     def add_children(self, children: Children):
         add_children(self, children)
@@ -51,6 +49,10 @@ class HLayout(QHBoxLayout):
         if children:
             self.add_children(children)
 
+    def set_children(self, children: Children):
+        self.clean()
+        self.add_children(children)
+
     def add_children(self, children: Children):
         add_children(self, children)
 
@@ -70,6 +72,10 @@ class GridLayout(QGridLayout):
             self.setAlignment(alignment)
         if children:
             self.add_children(children)
+
+    def set_children(self, children: Children):
+        self.clean()
+        self.add_children(children)
 
     def add_children(self, children: Children):
         add_children(self, children)
