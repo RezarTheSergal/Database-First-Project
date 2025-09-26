@@ -73,6 +73,9 @@ class FilterBlockClass(QWidget):
 
             combo = ComboBox()
             combo.setProperty("foreign_key", {"table": target_table, "column": target_column})
+            print(target_table, target_column)
+            response = DatabaseRepository().get_table_data(target_table, target_column)
+            logger.info(response)
             input_widget = combo
             logger.info(col_name)
             logger.info(col_info["foreign_keys"])
