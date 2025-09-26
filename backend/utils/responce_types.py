@@ -65,7 +65,7 @@ class DatabaseResponse:
             "message": self.message
         }
 
-        if self.data is not None:
+        if self.data != None:
             result["data"] = self.data
 
         if self.error_code:
@@ -77,7 +77,7 @@ class DatabaseResponse:
         if self.error_details:
             result["error_details"] = self.error_details
 
-        if self.affected_rows is not None:
+        if self.affected_rows != None:
             result["affected_rows"] = self.affected_rows
 
         return result
