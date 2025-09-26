@@ -59,9 +59,9 @@ def create_tables() -> DatabaseResponse:
     metadata_tables = set(Base.metadata.tables.keys())
     db_tables = set(inspect(db_engine).get_table_names())
 
-    if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
-        logger.info("Все таблицы уже существуют!")
-        return DatabaseResponse.success()
+    # if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
+    #     logger.info("Все таблицы уже существуют!")
+    #     return DatabaseResponse.success()
 
     Base.metadata.create_all(bind=db_engine)
     logger.info("Все таблицы успешно созданы!")
@@ -80,6 +80,10 @@ def create_tables() -> DatabaseResponse:
             logger.info("Список созданных таблиц:")
             for table in tables:
                 print(f"   - {table[0]}")
+        # with open(r"db_test_data.sql", encoding="utf-8") as f:
+        #     sql = f.read()
+        # conn.execute(text(sql))
+        # conn.commit()
     return DatabaseResponse.success()
                     
     
