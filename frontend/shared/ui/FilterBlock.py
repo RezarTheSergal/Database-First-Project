@@ -1,8 +1,6 @@
 from typing import Any, Dict, List
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSpinBox, QCheckBox, QComboBox, QDateEdit, QDoubleSpinBox
-from backend.database.models import Equipment, FailurePredictions, Inventory, MaintenanceLogs, ProductionBatches, Products, Sales, SensorReadings, Sensors
-from frontend.shared.ui import DateInput, VLayout, HLayout, Widget
-from frontend.shared.ui import ComboBox
+from frontend.shared.ui import VLayout, HLayout, Widget
 from frontend.shared.ui.ComboBox import ComboBoxClass
 from backend.repository import DatabaseRepository
 import logging
