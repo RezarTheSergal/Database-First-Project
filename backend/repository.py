@@ -154,7 +154,7 @@ class DatabaseRepository:
 
         # Проверяем запрашиваемые колонки
         if columns_list:
-            invalid_columns = set(columns_response).difference(columns_list)
+            invalid_columns = set(columns_response.data.keys()).difference(columns_list)
             if invalid_columns:
                 return DatabaseResponse.error(
                     ErrorCode.COLUMN_NOT_FOUND,
@@ -172,7 +172,7 @@ class DatabaseRepository:
 
                 # Применяем фильтры
                 if filters_dict:
-                    invalid_filter_columns = set(columns_response).difference(filters_dict.keys())
+                    invalid_filter_columns = set(columns_response.data.keys()).difference(filters_dict.keys())
                     if invalid_filter_columns:
                         return DatabaseResponse.error(
                             ErrorCode.INVALID_FILTER,
@@ -184,7 +184,7 @@ class DatabaseRepository:
 
                 # Применяем сортировку
                 if order_by:
-                    invalid_order_columns = set(columns_response).difference(order_by.keys())
+                    invalid_order_columns = set(columns_response.data.keys()).difference(order_by.keys())
                     if invalid_order_columns:
                         return DatabaseResponse.error(
                             ErrorCode.INVALID_ORDER_BY,
