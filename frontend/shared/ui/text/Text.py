@@ -18,5 +18,5 @@ class Text(QLabel):
         self.setWordWrap(hasWordWrap)
         self.setAlignment(alignment)
 
-        if font != None:
+        if font is not None:
             self.setFont(font)

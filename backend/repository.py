@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class DatabaseRepository:
     """Репозиторий для работы с базой данных"""
-
+  
     # Кэш для метаданных таблиц
     _columns_cache: Dict[str, Dict[str, Any]] = {}
     _cache_enabled: bool = True
@@ -30,7 +30,7 @@ class DatabaseRepository:
     @DatabaseErrorHandler()
     def get_model_by_tablename(cls, table_name: str) -> DatabaseResponse:
         """Получение класса таблицы по её имени"""
-        if table_name == None or not isinstance(table_name, str):
+        if table_name is None or not isinstance(table_name, str):
             return DatabaseResponse.error(
                 ErrorCode.INVALID_PARAMETERS,
                 "Некорректное имя таблицы"
@@ -70,14 +70,14 @@ class DatabaseRepository:
     @DatabaseErrorHandler()
     def get_table_columns(cls, table_name: str, use_cache: bool = True) -> DatabaseResponse:
         """Получение полной информации о колонках таблицы, включая типы, внешние ключи, enum-значения и ограничения."""
-
+      
         # Проверяем кэш
         if use_cache and cls._cache_enabled and table_name in cls._columns_cache:
             return DatabaseResponse.success(
                 data=cls._columns_cache[table_name],
                 message=f"Найдено {len(cls._columns_cache[table_name])} колонок в таблице '{table_name}' (из кэша)"
             )
-
+      
         model_response = cls.get_model_by_tablename(table_name)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
@@ -108,7 +108,7 @@ class DatabaseRepository:
                 }
 
                 # Обработка default
-                if column.default != None:
+                if column.default is not None:
                     if hasattr(column.default, 'arg'):
                         col_info['default'] = str(column.default.arg)
                     else:
@@ -188,11 +188,11 @@ class DatabaseRepository:
             with Database().get_db_session() as session:
                 # Базовый запрос
                 joined_models = {table_name: main_model}
-
+              
                 if columns_list:
                     # Используем колонки моделей вместо text()
                     select_columns = []
-
+                  
                     for col_spec in columns_list:
                         if '.' in col_spec:
                             table_part, column_part = col_spec.split('.', 1)
@@ -203,13 +203,13 @@ class DatabaseRepository:
                         else:
                             if hasattr(main_model, col_spec):
                                 select_columns.append(getattr(main_model, col_spec))
-
+                  
                     if not select_columns:
                         return DatabaseResponse.error(
                             ErrorCode.COLUMN_NOT_FOUND,
                             "Ни одна из указанных колонок не найдена"
                         )
-
+                  
                     query = select(*select_columns)
                 else:
                     query = select(main_model)
@@ -220,14 +220,14 @@ class DatabaseRepository:
                         join_table_name = join_item["table"]
                         join_type = join_item.get("type", "inner").lower()
                         join_on = join_item["on"]
-
+                      
                         join_model_response = cls.get_model_by_tablename(join_table_name)
                         if join_model_response.status != ResponseStatus.SUCCESS:
                             return join_model_response
-
+                      
                         join_model = join_model_response.data
                         joined_models[join_table_name] = join_model
-
+                      
                         # Построение условия JOIN
                         if isinstance(join_on, dict) and "condition" in join_on:
                             logger.warning(f"Используется raw SQL условие для JOIN: {join_on['condition']}")
@@ -239,23 +239,23 @@ class DatabaseRepository:
                                     main_col = f"{table_name}.{main_col}"
                                 if '.' not in join_col:
                                     join_col = f"{join_table_name}.{join_col}"
-
+                              
                                 main_table, main_col_name = main_col.split('.')
                                 join_table, join_col_name = join_col.split('.')
-
+                              
                                 if main_table in joined_models and join_table in joined_models:
                                     main_col_obj = getattr(joined_models[main_table], main_col_name)
                                     join_col_obj = getattr(joined_models[join_table], join_col_name)
                                     join_conditions.append(main_col_obj == join_col_obj)
-
+                          
                             if not join_conditions:
                                 return DatabaseResponse.error(
                                     ErrorCode.INVALID_JOIN_CONDITION,
                                     "Неверное условие JOIN"
                                 )
-
+                          
                             join_condition = and_(*join_conditions)
-
+                      
                         # Применяем JOIN
                         if join_type == "left":
                             query = query.join(join_model, join_condition, isouter=True)
@@ -273,20 +273,20 @@ class DatabaseRepository:
                     filter_conditions = cls._build_filter_conditions(
                         filters_dict, joined_models, table_name
                     )
-
+                  
                     if filter_conditions.status != ResponseStatus.SUCCESS:
                         return filter_conditions
-
+                  
                     if filter_conditions.data:
                         query = query.where(and_(*filter_conditions.data))
 
                 # Применяем сортировку
                 if order_by:
                     order_conditions = []
-
+                  
                     for order_col, order_dir in order_by.items():
                         col_obj = None
-
+                      
                         if '.' in order_col:
                             table_part, column_part = order_col.split('.', 1)
                             if table_part in joined_models:
@@ -296,25 +296,25 @@ class DatabaseRepository:
                         else:
                             if hasattr(main_model, order_col):
                                 col_obj = getattr(main_model, order_col)
-
-                        if col_obj != None:
+                      
+                        if col_obj is not None:
                             if order_dir.lower() == "desc":
                                 order_conditions.append(desc(col_obj))
                             else:
                                 order_conditions.append(asc(col_obj))
-
+                  
                     if order_conditions:
                         query = query.order_by(*order_conditions)
 
                 # Применяем лимит и смещение
-                if limit != None:
+                if limit is not None:
                     query = query.limit(limit)
-                if offset != None:
+                if offset is not None:
                     query = query.offset(offset)
 
                 # Выполняем запрос
                 result = session.execute(query)
-
+              
                 if columns_list:
                     rows = result.fetchall()
                     data = []
@@ -356,16 +356,16 @@ class DatabaseRepository:
         main_table: str
     ) -> DatabaseResponse:
         """Построение условий фильтрации с поддержкой расширенных операторов"""
-
+      
         conditions = []
         main_model = joined_models[main_table]
-
+      
         for filter_key, filter_value in filters_dict.items():
             # Парсим имя колонки и оператор
             parts = filter_key.split('__')
             column_name = parts[0]
             operator = 'eq' if len(parts) == 1 else parts[1]
-
+          
             # Определяем таблицу и модель
             if '.' in column_name:
                 table_part, column_part = column_name.split('.', 1)
@@ -380,46 +380,46 @@ class DatabaseRepository:
             else:
                 table_model = main_model
                 table_name = main_table
-
+          
             # Проверяем существование колонки
             if not hasattr(table_model, column_name):
                 return DatabaseResponse.error(
                     ErrorCode.COLUMN_NOT_FOUND,
                     f"Колонка '{column_name}' не найдена в таблице '{table_name}'"
                 )
-
+          
             col_obj = getattr(table_model, column_name)
-
+          
             # Получаем информацию о типе колонки для валидации
             col_info_response = cls._get_column_info(table_name, column_name)
             if col_info_response.status == ResponseStatus.SUCCESS:
                 col_info = col_info_response.data
             else:
                 col_info = None
-
+          
             # Валидируем значение в зависимости от типа
             validation_result = cls._validate_filter_value(filter_value, operator, col_info)
             if validation_result.status != ResponseStatus.SUCCESS:
                 return validation_result
-
+          
             validated_value = validation_result.data
-
+          
             # Строим условие в зависимости от оператора
             condition = cls._build_condition_for_operator(col_obj, operator, validated_value)
-            if condition != None:
+            if condition is not None:
                 conditions.append(condition)
             else:
                 return DatabaseResponse.error(
                     ErrorCode.INVALID_FILTER,
                     f"Неподдерживаемый оператор: {operator}"
                 )
-
+      
         return DatabaseResponse.success(data=conditions)
 
     @classmethod
     def _build_condition_for_operator(cls, column, operator: str, value: Any):
         """Создает SQL условие для конкретного оператора"""
-
+      
         operators = {
             'eq': lambda: column == value,
             'neq': lambda: column != value,
@@ -436,7 +436,7 @@ class DatabaseRepository:
             'between': lambda: column.between(value[0], value[1]),
             'is_null': lambda: column.is_(None) if value else column.isnot(None),
         }
-
+      
         if operator in operators:
             try:
                 return operators[operator]()
@@ -448,7 +448,7 @@ class DatabaseRepository:
     @classmethod
     def _validate_filter_value(cls, value: Any, operator: str, col_info: Optional[Dict] = None) -> DatabaseResponse:
         """Валидация значений фильтров в зависимости от типа данных"""
-
+      
         # Валидация для оператора IN
         if operator in ('in', 'not_in'):
             if not isinstance(value, (list, tuple)):
@@ -456,7 +456,7 @@ class DatabaseRepository:
                     ErrorCode.INVALID_FILTER,
                     f"Оператор '{operator}' требует список значений, получен: {type(value).__name__}"
                 )
-
+      
         # Валидация для оператора BETWEEN
         if operator == 'between':
             if not isinstance(value, (list, tuple)) or len(value) != 2:
@@ -464,23 +464,23 @@ class DatabaseRepository:
                     ErrorCode.INVALID_FILTER,
                     "Оператор 'between' требует список из двух значений [min, max]"
                 )
-            if value[0] == None or value[1] == None:
+            if value[0] is None or value[1] is None:
                 return DatabaseResponse.error(
                     ErrorCode.INVALID_FILTER,
                     "Оператор 'between' не поддерживает None значения"
                 )
-
+      
         # Валидация для оператора IS_NULL
         if operator == 'is_null' and not isinstance(value, bool):
             return DatabaseResponse.error(
                 ErrorCode.INVALID_FILTER,
                 "Оператор 'is_null' требует булево значение"
             )
-
+      
         # Валидация типов данных если есть информация о колонке
-        if col_info and value != None and operator not in ["is_null"]:
+        if col_info and value is not None and operator not in ['is_null']:
             col_type = col_info['type'].lower()
-
+          
             # Валидация числовых типов
             if any(num_type in col_type for num_type in ['int', 'numeric', 'decimal', 'float']):
                 if operator in ['gt', 'gte', 'lt', 'lte', 'between', 'in']:
@@ -496,7 +496,7 @@ class DatabaseRepository:
                             ErrorCode.INVALID_FILTER,
                             f"Для числовой колонки ожидается число, получено: {value}"
                         )
-
+          
             # Валидация дат
             elif any(date_type in col_type for date_type in ['date', 'timestamp', 'datetime']):
                 if operator in ['gt', 'gte', 'lt', 'lte', 'between', 'in']:
@@ -517,7 +517,7 @@ class DatabaseRepository:
                             ErrorCode.INVALID_FILTER,
                             f"Неверный формат даты: {str(e)}"
                         )
-
+          
             # Валидация ENUM
             elif col_info.get('enum_values') and operator not in ['like', 'ilike']:
                 enum_values = col_info['enum_values']
@@ -525,13 +525,13 @@ class DatabaseRepository:
                     invalid_values = [v for v in value if v not in enum_values]
                 else:
                     invalid_values = [value] if value not in enum_values else []
-
+              
                 if invalid_values:
                     return DatabaseResponse.error(
                         ErrorCode.INVALID_FILTER,
                         f"Недопустимые значения для ENUM колонки: {invalid_values}. Допустимо: {enum_values}"
                     )
-
+      
         return DatabaseResponse.success(data=value)
 
     @classmethod
@@ -551,13 +551,13 @@ class DatabaseRepository:
                 '%d.%m.%Y',
                 '%Y-%m-%dT%H:%M:%S.%f'  # ISO формат с микросекундами
             ]
-
+          
             for fmt in formats:
                 try:
                     return datetime.strptime(date_value, fmt)
                 except ValueError:
                     continue
-
+          
             raise ValueError(f"Неизвестный формат даты: {date_value}. Поддерживаемые форматы: {formats}")
         else:
             raise ValueError(f"Неподдерживаемый тип даты: {type(date_value).__name__}")
@@ -568,14 +568,14 @@ class DatabaseRepository:
         columns_response = cls.get_table_columns(table_name)
         if columns_response.status != ResponseStatus.SUCCESS:
             return columns_response
-
+      
         columns_info = columns_response.data
         if column_name not in columns_info:
             return DatabaseResponse.error(
                 ErrorCode.COLUMN_NOT_FOUND,
                 f"Колонка '{column_name}' не найдена в таблице '{table_name}'"
             )
-
+      
         return DatabaseResponse.success(data=columns_info[column_name])
 
     @classmethod
@@ -698,7 +698,7 @@ class DatabaseRepository:
 
                 # Формируем результат: список словарей
                 data = [
-                    {"id": row[0], "display": str(row[1]) if row[1] != None else ""}
+                    {"id": row[0], "display": str(row[1]) if row[1] is not None else ""}
                     for row in rows
                 ]
 
@@ -712,6 +712,7 @@ class DatabaseRepository:
                 e,
                 f"search_foreign_key(table={table}, display_col={display_col}, id_col={id_col}, query={query})"
             )
+
 
     @classmethod
     @DatabaseErrorHandler()
@@ -753,14 +754,12 @@ class DatabaseRepository:
         # Проверяем обязательные поля (NOT NULL без default)
         missing_required = []
         for col_name, col_info in columns_info.items():
-            if (
-                not col_info["nullable"]
-                and col_info["default"] == None
-                and not col_info["primary_key"]
-                and col_name not in valid_params
-            ):
+            if (not col_info['nullable'] and
+                col_info['default'] is None and
+                not col_info['primary_key'] and
+                col_name not in valid_params):
                 missing_required.append(col_name)
-
+      
         if missing_required:
             return DatabaseResponse.error(
                 ErrorCode.INVALID_PARAMETERS,
@@ -906,7 +905,7 @@ class DatabaseRepository:
                 )
                 if filter_conditions.status != ResponseStatus.SUCCESS:
                     return filter_conditions
-
+                
                 if not filter_conditions.data:
                     return DatabaseResponse.error(
                         ErrorCode.INVALID_FILTER,

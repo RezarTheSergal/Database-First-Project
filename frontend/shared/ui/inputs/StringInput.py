@@ -12,6 +12,3 @@ class StringInput(QLineEdit):
 
     def get_value(self) -> str:
         return self.text()
-
-    def clear_value(self):
-        self.setText("")

@@ -9,20 +9,20 @@ def add_children(layout: QLayout, children: Children):
 
 def clean(layout: QLayout):
     """Удаляет всех детей из QLayout"""
-    if layout == None:
+    if layout is None:
         return
 
     while layout.count():
         child = layout.takeAt(0)
-        if child == None:  # Add this crucial check
+        if child is None:  # Add this crucial check
             continue
 
-        isLayout = child.layout() != None
+        isLayout = child.layout() is not None
         if isLayout:
             clean(child.layout())
         else:
             widget = child.widget()
-            if widget != None:  # Store widget reference to avoid multiple calls
+            if widget is not None:  # Store widget reference to avoid multiple calls
                 widget.setParent(None)
                 widget.deleteLater()
 

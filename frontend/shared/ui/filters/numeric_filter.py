@@ -1,41 +1,36 @@
+from PySide6.QtWidgets import QSpinBox, QDoubleSpinBox
 from frontend.shared.ui.inputs import IntInput, FloatInput
-from .BaseFilterWidget import BaseFilterWidget
-
+from .base import BaseFilterWidget
 
 class IntegerFilterWidget(BaseFilterWidget):
     """Виджет фильтра для целочисленных полей"""
-
-    input_widget: IntInput
-
-    def _create_input_widget(self) -> IntInput:
+    
+    def _create_input_widget(self) -> QSpinBox:
         spin = IntInput()
         spin.setMinimum(-2147483648)
         spin.setMaximum(2147483647)
         spin.setValue(0)
         return spin
-
+    
     def get_filter_value(self) -> int:
-        return self.input_widget.get_value()
-
+        return self.input_widget.value()
+    
     def clear_value(self):
         self.input_widget.setValue(0)
 
-
 class FloatFilterWidget(BaseFilterWidget):
     """Виджет фильтра для числовых полей с плавающей точкой"""
-
-    input_widget: FloatInput
-
-    def _create_input_widget(self) -> FloatInput:
+    
+    def _create_input_widget(self) -> QDoubleSpinBox:
         spin = FloatInput()
         spin.setDecimals(2)
         spin.setMinimum(-999999999.99)
         spin.setMaximum(999999999.99)
         spin.setValue(0.0)
         return spin
-
+    
     def get_filter_value(self) -> float:
-        return self.input_widget.get_value()
-
+        return self.input_widget.value()
+    
     def clear_value(self):
         self.input_widget.setValue(0.0)

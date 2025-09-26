@@ -1,2 +1,2 @@
 def isNull(value: str | None) -> bool:
-    return value == None or value == ""
+    return value is None or value == ""

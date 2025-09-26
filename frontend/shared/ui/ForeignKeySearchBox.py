@@ -1,21 +1,22 @@
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QComboBox
 from PySide6.QtCore import QTimer
 from backend.repository import DatabaseRepository
-from frontend.shared.ui import Widget, ComboBox, Completer, HLayout
 from backend.utils.responce_types import ResponseStatus
 
-
-class ForeignKeySearchBox(Widget):
+class ForeignKeySearchBox(QWidget):
     def __init__(self, target_table: str, display_column: str, id_column: str):
-        super().__init__(HLayout())
+        super().__init__()
         self.target_table = target_table
         self.display_column = display_column
         self.id_column = id_column
 
-        self.combo = ComboBox()
-        self.combo.setCompleter(Completer())
+        layout = QHBoxLayout()
+        self.combo = QComboBox()
+        self.combo.setCompleter(None)
         self.combo.setEditable(True)
-        self.combo.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
-        self.add_children([self.combo])
+        self.combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        layout.addWidget(self.combo)
+        self.setLayout(layout)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -35,31 +36,31 @@ class ForeignKeySearchBox(Widget):
             return
 
         # Асинхронный запрос (в реальности — через QThread или async)
-        response = DatabaseRepository().search_foreign_key(
+        results = DatabaseRepository().search_foreign_key(
             table=self.target_table,
             display_col=self.display_column,
             id_col=self.id_column,
             query=text,
-            limit=30,
+            limit=30
         )
-        if response.status == ResponseStatus.SUCCESS and response.data != None:
-            self.combo.blockSignals(True)
-            self.combo.clear()
-            for item in response.data:
-                self.combo.addItem(item[self.display_column], item[self.id_column])
-            self.combo.blockSignals(False)
+
+        self.combo.blockSignals(True)
+        self.combo.clear()
+        for item in results:
+            self.combo.addItem(item[self.display_column], item[self.id_column])
+        self.combo.blockSignals(False)
 
     def on_focus(self):
         if self.combo.count() == 0:
-            response = DatabaseRepository.search_foreign_key(
+            resp = DatabaseRepository.search_foreign_key(
                 table=self.target_table,
                 display_col=self.display_column,
                 id_col=self.id_column,
                 query="",  # пустой запрос → можно вернуть первые N
-                limit=10,
+                limit=10
             )
-            if response.status == ResponseStatus.SUCCESS and response.data != None:
-                for item in response.data:
+            if resp.status == ResponseStatus.SUCCESS:
+                for item in resp.data:
                     self.combo.addItem(str(item["display"]), userData=item["id"])
 
     def _on_selection(self, index: int):
