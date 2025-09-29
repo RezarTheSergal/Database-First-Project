@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QLabel
-from .Alignment import Alignment
+from ..Alignment import Alignment
 from .Font import Font
+
 
 class Text(QLabel):
 

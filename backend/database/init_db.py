@@ -18,7 +18,7 @@ from backend.settings import PgConfig
 import logging
 
 db_engine = Database().get_engine()
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 @DatabaseErrorHandler()
 def create_database_if_not_exists() -> DatabaseResponse:
@@ -59,9 +59,9 @@ def create_tables() -> DatabaseResponse:
     metadata_tables = set(Base.metadata.tables.keys())
     db_tables = set(inspect(db_engine).get_table_names())
 
-    # if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
-    #     logger.info("Все таблицы уже существуют!")
-    #     return DatabaseResponse.success()
+    if len(metadata_tables.intersection(db_tables)) == len(metadata_tables):
+        logger.info("Все таблицы уже существуют!")
+        return DatabaseResponse.success()
 
     Base.metadata.create_all(bind=db_engine)
     logger.info("Все таблицы успешно созданы!")

@@ -1,5 +1,5 @@
 from PySide6.QtGui import QFont
-from .const import DEFAULT_FONT_FAMILY
+from ..const import DEFAULT_FONT_FAMILY
 
 
 class Font(QFont):

@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+from backend.utils.join_path import join_path
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 load_dotenv(".env")
@@ -24,6 +26,9 @@ STYLESHEET_PATH = (
 ICON_PATH = (
     Path(BASE_DIR).parent.resolve() / "frontend" / "images" / "favicon.ico"
 ).__str__()
+
+# i18n path (frontend)
+LOCALES_PATH = join_path(BASE_DIR, "frontend/shared/lib/i18n/locales")
 
 # Postgres env setup
 HOST = os.getenv('DB_HOST', default='localhost')

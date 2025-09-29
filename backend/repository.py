@@ -8,7 +8,7 @@ from backend.utils.responce_types import DatabaseResponse, ErrorCode, ResponseSt
 from backend.database.models import Base
 from backend.database.database import Database
 from sqlalchemy import (
-    CheckConstraint, TextClause, Tuple, and_, asc, delete, desc,
+    CheckConstraint, String, TextClause, Tuple, and_, asc, cast, delete, desc,
     select, insert, update, text
 )
 from typing import Dict, List, Optional, Any
@@ -16,7 +16,7 @@ from sqlalchemy import Enum as SQLEnum
 
 
 db_engine = Database().get_engine()
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class DatabaseRepository:
@@ -659,7 +659,7 @@ class DatabaseRepository:
         model_response = cls.get_model_by_tablename(table)
         if model_response.status != ResponseStatus.SUCCESS:
             return model_response
-        model = model_response.data
+        model: type[Base] = model_response.data
 
         # 2. Проверяем существование колонок
         columns_response = cls.get_table_columns(table)
@@ -690,7 +690,7 @@ class DatabaseRepository:
             with Database().get_db_session() as session:
                 stmt = (
                     select(id_column, display_column)
-                    .where(display_column.ilike(search_pattern))
+                    .where(cast(display_column, String).ilike(search_pattern))
                     .limit(limit)
                 )
                 result = session.execute(stmt)

@@ -1,6 +1,6 @@
 from .Text import Text
 from .Font import Font
-from ..lib.utils import setId
+from ...lib.utils import setId
 from PySide6.QtGui import QLinearGradient, QBrush, QPalette
 from PySide6.QtCore import Qt
 

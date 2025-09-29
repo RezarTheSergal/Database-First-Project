@@ -2,18 +2,20 @@ import sys
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
 from frontend import MainWindow
-from backend.utils.logger import setup_logging
-# Перенёс все константы в файл настройки
+from backend.utils.logger import logging, setup_logging
 from backend.settings import LOG_FILE_PATH, STYLESHEET_PATH
 
-def keep_loop_running(app, engine):
+logger = logging.getLogger()
+
+
+def quit_gracefully(app, engine):
     del engine
     exit_code = app.exec()
 
     if exit_code == 0:
-        print(f"Program exited gracefully with code {exit_code}")
+        logger.info(f"Program exited gracefully with code {exit_code}")
     else:
-        print(f"Program crashed with error code: {exit_code}")
+        logger.error(f"Program crashed with error code: {exit_code}")
 
     sys.exit(exit_code)
 
@@ -25,13 +27,14 @@ def apply_stylesheet(app: QApplication):
 
 def setup_frontend():
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(True)
     apply_stylesheet(app)
     engine = QQmlApplicationEngine(app)
 
     main_window = MainWindow()
     main_window.show()
 
-    keep_loop_running(app, engine)
+    quit_gracefully(app, engine)
 
 
 if __name__ == "__main__":

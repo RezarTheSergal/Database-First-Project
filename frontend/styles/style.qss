@@ -3,6 +3,8 @@
 Фон окна: background-color: rgb(8, 20, 15) до rgb(1, 7, 4)
 Граница кнопки: rgb(43, 87, 71)
 Градиент кнопки: от rgb(25, 57, 46) до rgb(22, 47, 39) (СЛЕВА-НАПРАВО)
+
+Фон на ховере: #389150 ИЛИ #20462a
  */
 
 *,
@@ -15,11 +17,19 @@
   color: #0ffa4a;
 }
 
+QMessageBox, QListWidget, QLineEdit, QTextEdit, QDateEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+  background-color: rgb(22, 22, 22);
+}
+
+QLabel {
+  background: none;
+}
+
 QMainWindow, QWidget.modal {
   background-color: qradialgradient(cx:0.5, cy:0.5, radius:1, fx:0, fy:0, stop:0 rgb(8, 20, 15), stop:1 rgb(1, 7, 4));
 }
 
-.hr {
+QWidget.hr {
   border: none;
   background-color: qradialgradient(cx:0.5, cy:0.5, radius:1, fx:0, fy:0, stop:0 rgb(25, 57, 46), stop:1 rgb(22, 47, 39));
 }
@@ -41,4 +51,3 @@ QPushButton:pressed {
   background-color: #0ffa4a;
   color: #cde4ce;
 }
-
