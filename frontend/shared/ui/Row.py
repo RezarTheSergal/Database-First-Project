@@ -11,12 +11,15 @@ from ..lib.utils import setClass
 
 font = Font(12)
 
+
 def isIntType(type: str) -> bool:
     return type == "INTEGER" or "NUMERIC" in type
+
 
 def return_element_by_type(type: str, *args, **kwargs):
     if isIntType(type):
         return IntInput(*args, **kwargs)
+
     match (type):
         case "TEXT":
             return StringInput(*args, **kwargs)
@@ -29,18 +32,20 @@ def return_element_by_type(type: str, *args, **kwargs):
         case _:
             return StringInput(*args, **kwargs)
 
+
 class Row(Widget):
+    _layout = HLayout()
+
     def __init__(self, en_label: str, ru_label: str, type: str, placeholder: str = ""):
-        # Создаем layout для каждого экземпляра!
-        super().__init__(layout=HLayout())  # ✅ Передаем layout в родительский класс
-        
+        super().__init__()
         self.en_label = en_label
         self.ru_label = ru_label
-        
+        self.setLayout(self._layout)
+
         setClass(self, "row")
-        
         self.label = Text(ru_label, font=font)
         self.input = return_element_by_type(type, placeholder)
+
         self.add_children([self.label, self.input])
 
     def get_label(self, locale: str) -> str:

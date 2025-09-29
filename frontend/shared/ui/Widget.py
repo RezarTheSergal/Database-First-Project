@@ -2,10 +2,10 @@ from PySide6.QtWidgets import QWidget
 from frontend.shared.ui import HLayout, VLayout
 
 class Widget(QWidget):
+    _layout = None
+
     def __init__(self, layout: HLayout | VLayout | None = None):
         super().__init__()
-        self._layout = None  # Переместили сюда!
-        
         if layout is not None:
             self._layout = layout
             self.setLayout(self._layout)

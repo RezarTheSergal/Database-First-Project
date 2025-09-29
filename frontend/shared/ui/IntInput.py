@@ -8,6 +8,4 @@ class IntInput(QDoubleSpinBox):
             self.setRange(min, max)
 
     def get_value(self) -> int:
-        return int(
-            self.text().split(",")[0]
-        )
+        return int(self.text())
