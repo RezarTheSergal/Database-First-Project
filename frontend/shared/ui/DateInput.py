@@ -6,4 +6,4 @@ class DateInput(QDateEdit):
         super().__init__()
 
     def get_value(self) -> str:
-        return str(self.text())
+         return self.date().toString("yyyy-MM-dd") #возвращаем сразу правильный формат для обработки бд
