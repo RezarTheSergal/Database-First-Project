@@ -1,22 +1,22 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QComboBox
 from PySide6.QtCore import QTimer
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
+from frontend.shared.ui.inputs import AutoComplete, ComboBox
+from frontend.shared.ui import Widget, HLayout
 
-class ForeignKeySearchBox(QWidget):
+
+class ForeignKeySearchBox(Widget):
     def __init__(self, target_table: str, display_column: str, id_column: str):
-        super().__init__()
+        super().__init__(HLayout())
         self.target_table = target_table
         self.display_column = display_column
         self.id_column = id_column
 
-        layout = QHBoxLayout()
-        self.combo = QComboBox()
-        self.combo.setCompleter(None)
+        self.combo = ComboBox()
+        self.combo.setCompleter(AutoComplete())
         self.combo.setEditable(True)
-        self.combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        layout.addWidget(self.combo)
-        self.setLayout(layout)
+        self.combo.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
+        self.layout.addWidget(self.combo)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -41,14 +41,14 @@ class ForeignKeySearchBox(QWidget):
             display_col=self.display_column,
             id_col=self.id_column,
             query=text,
-            limit=30
+            limit=30,
         )
-
-        self.combo.blockSignals(True)
-        self.combo.clear()
-        for item in results:
-            self.combo.addItem(item[self.display_column], item[self.id_column])
-        self.combo.blockSignals(False)
+        if results.data:
+            self.combo.blockSignals(True)
+            self.combo.clear()
+            for item in results.data:
+                self.combo.addItem(item[self.display_column], item[self.id_column])
+            self.combo.blockSignals(False)
 
     def on_focus(self):
         if self.combo.count() == 0:
@@ -57,7 +57,7 @@ class ForeignKeySearchBox(QWidget):
                 display_col=self.display_column,
                 id_col=self.id_column,
                 query="",  # пустой запрос → можно вернуть первые N
-                limit=10
+                limit=10,
             )
             if resp.status == ResponseStatus.SUCCESS:
                 for item in resp.data:

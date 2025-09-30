@@ -1,6 +1,6 @@
 from .Size import Size
 from .Icon import Icon
-from .Layouts import GridLayout
+from .Layouts import VLayout
 from .Widget import Widget
 from .const import DEFAULT_MAX_SIZE
 from backend.settings import ICON_PATH
@@ -8,7 +8,6 @@ from frontend.shared.lib.utils import setClass
 
 
 class Modal(Widget):
-
     def __init__(
         self,
         parent,
@@ -16,7 +15,7 @@ class Modal(Widget):
         title="NO_TITLE",
         accessible_name="",
     ):
-        super().__init__(GridLayout())
+        super().__init__(VLayout())
         setClass(self, "modal")
         self.setWindowTitle(title)
         self.setMaximumSize(max_size.w, max_size.h)

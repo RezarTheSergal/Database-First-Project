@@ -18,7 +18,7 @@ class FormRow(Widget):
         self.label = Text(ru_label, font=font)
         self.input = input
 
-        self.set_children([self.label, self.input])
+        self.layout.set_children([self.label, self.input])
 
     def get_label(self, locale: str) -> str:
         if locale == "en":
