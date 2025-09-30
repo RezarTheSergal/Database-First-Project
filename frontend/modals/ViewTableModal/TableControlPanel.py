@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List, Dict, Any
-from PySide6.QtWidgets import QWidget, QScrollArea
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import QScrollArea, QWidget
+from PySide6.QtCore import Qt
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.Table import DynamicTable
@@ -15,11 +15,12 @@ from frontend.utils.MessageFactory import MessageFactory
 logger = logging.getLogger(__name__)
 database = DatabaseRepository()
 
-class TableControlPanel(QWidget):
+
+class TableControlPanel(Widget):
     """Панель управления фильтрами для таблиц с поддержкой множественных блоков"""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__(VLayout())
         self.blocks: List[FilterBlockClass] = []
         self.table_names = []
 
@@ -29,9 +30,6 @@ class TableControlPanel(QWidget):
 
     def _setup_ui(self):
         """Настройка пользовательского интерфейса"""
-        main_layout = VLayout()
-        self.setLayout(main_layout)
-
         # Заголовок
         title_layout = HLayout()
 
@@ -51,7 +49,7 @@ class TableControlPanel(QWidget):
         title_layout.addWidget(self.apply_button)
         title_layout.addStretch()
 
-        main_layout.addLayout(title_layout)
+        self.layout.addLayout(title_layout)
 
         # Скроллируемый контейнер для блоков фильтров
         scroll_area = QScrollArea()
@@ -62,12 +60,12 @@ class TableControlPanel(QWidget):
         self.blocks_container = Widget(VLayout())
         scroll_area.setWidget(self.blocks_container)
 
-        main_layout.addWidget(scroll_area)
+        self.layout.addWidget(scroll_area)
 
         self.table_widget = DynamicTable()
         self.table_widget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.table_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        main_layout.addWidget(self.table_widget)
+        self.layout.addWidget(self.table_widget)
 
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""

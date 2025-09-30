@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional
-from PySide6.QtWidgets import QWidget, QHBoxLayout
 from backend.utils.responce_types import ResponseStatus
-from frontend.shared.ui import VLayout, Widget
+from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
 from frontend.shared.ui.filters.factory import FilterWidgetFactory
@@ -11,13 +10,13 @@ import logging
 logger = logging.getLogger()
 database = DatabaseRepository()
 
-class FilterBlockClass(QWidget):
-    def __init__(self, initial_tables=None, parent=None):
-        super().__init__(parent)
+
+class FilterBlockClass(Widget):
+    def __init__(self, initial_tables=None):
+        super().__init__(HLayout())
 
         # Основной layout
-        self.main_layout = QHBoxLayout(self)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         # ComboBox для выбора таблицы
         self.table_combo = ComboBox(
@@ -32,8 +31,7 @@ class FilterBlockClass(QWidget):
         self.filter_widgets: Dict[str, BaseFilterWidget] = {}
 
         # Добавляем в layout
-        self.main_layout.addWidget(self.table_combo)
-        self.main_layout.addWidget(self.filters_container)
+        self.layout.add_children([self.table_combo, self.filters_container])
 
     def _on_table_changed(self, table_name: str):
         """Обновляет фильтры под выбранную таблицу"""

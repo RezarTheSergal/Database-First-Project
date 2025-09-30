@@ -1,22 +1,22 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QComboBox
+from PySide6.QtWidgets import QCompleter
 from PySide6.QtCore import QTimer
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
+from frontend.shared.ui import ComboBox, Widget, HLayout
 
-class ForeignKeySearchBox(QWidget):
+
+class ForeignKeySearchBox(Widget):
     def __init__(self, target_table: str, display_column: str, id_column: str):
-        super().__init__()
+        super().__init__(HLayout())
         self.target_table = target_table
         self.display_column = display_column
         self.id_column = id_column
 
-        layout = QHBoxLayout()
-        self.combo = QComboBox()
-        self.combo.setCompleter(None)
+        self.combo = ComboBox()
+        self.combo.setCompleter(QCompleter())
         self.combo.setEditable(True)
-        self.combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        layout.addWidget(self.combo)
-        self.setLayout(layout)
+        self.combo.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
+        self.layout.addWidget(self.combo)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)

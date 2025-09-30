@@ -1,8 +1,8 @@
-from PySide6 import QtWidgets as Qw, QtGui as Qg
+from frontend.shared.ui import Widget, VLayout, Icon
 
 
-class MainWindow(Qw.QWidget):
-    def __init__(self, title: str, icon: Qg.QIcon):
-        super().__init__()
+class MainWindow(Widget):
+    def __init__(self, title: str, icon: Icon):
+        super().__init__(VLayout())
         self.setWindowTitle(title)
         self.setWindowIcon(icon)
