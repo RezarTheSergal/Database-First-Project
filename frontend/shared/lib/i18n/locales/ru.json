@@ -41,5 +41,9 @@
     "sensor_readings": "Замеры датчиков",
     "failure_predictions": "Предсказания неудачной партии",
     "maintance_logs": "Логи техобслуживания",
-    "quantity_produced": "Количество"
+    "quantity_produced": "Количество",
+    "quantity_in_stock": "В наличии, шт.",
+    "sensor_id": "ID сенсора",
+    "equipment_id": "ID оборудования",
+    "product_id": "ID товара"
 }

@@ -4,7 +4,11 @@ from contextlib import contextmanager
 from backend.settings import PgConfig
 from backend.utils.database_exception_handler import DatabaseErrorHandler
 
-
+'''
+Singleton гарантирует, что класс имеет только один экземпляр во всем приложении и предоставляет 
+глобальную точку доступа к нему(получается так что все части приложения работают с одним пуллом
+соединений)
+'''
 class Singleton(type):
     _instances = {}
     def __call__(self, *args, **kwds):

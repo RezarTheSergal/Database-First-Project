@@ -1,15 +1,19 @@
 from PySide6.QtWidgets import QDoubleSpinBox
-from .GenericInput import GenericInput
+from .isNull import isNull
 
 
-class FloatInput(GenericInput, QDoubleSpinBox):
-    def __init__(self, min: float = -(10.0**10), max: float = 10.0**10, **kwargs):
-        super().__init__()
-        if range:
-            self.setRange(min, max)
+class FloatInput(QDoubleSpinBox):
+    is_nullable: bool
+    can_be_negative: bool
+    min: float
+    max: float
 
     def get_value(self) -> float:
         return float(self.text())
 
     def is_value_valid(self) -> bool:
-        return self.text().isdecimal()
+        if not self.is_nullable and isNull(self.text()):
+            return False
+        elif not self.can_be_negative and float(self.text()) < 0:
+            return False
+        return True

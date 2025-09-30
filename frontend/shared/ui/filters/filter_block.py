@@ -4,8 +4,8 @@ from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import VLayout, Widget
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
-from frontend.shared.ui.filters.factory import FilterWidgetFactory
-from frontend.shared.ui.filters.base import BaseFilterWidget
+from filters.factory import FilterWidgetFactory
+from filters.base import BaseFilterWidget
 import logging
 
 logger = logging.getLogger()
@@ -109,7 +109,7 @@ class FilterBlockClass(QWidget):
         for col_name, filter_widget in self.filter_widgets.items():
             if not filter_widget.is_empty():
                 value = filter_widget.get_filter_value()
-                if value is not None or value != "" or value != "--не выбрано--" :
+                if value is not None:
                     result[col_name] = value
         
         return result
@@ -129,8 +129,3 @@ class FilterBlockClass(QWidget):
             else:
                 # Для простых фильтров (пока не реализовано)
                 pass
-
-    def reset_filters(self):
-        """Сбрасывает все фильтры в начальное состояние"""
-        for filter_widget in self.filter_widgets.values():
-            filter_widget.clear_value()

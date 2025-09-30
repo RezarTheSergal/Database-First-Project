@@ -18,7 +18,7 @@ from backend.settings import PgConfig
 import logging
 
 db_engine = Database().get_engine()
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 @DatabaseErrorHandler()
 def create_database_if_not_exists() -> DatabaseResponse:
@@ -80,6 +80,10 @@ def create_tables() -> DatabaseResponse:
             logger.info("Список созданных таблиц:")
             for table in tables:
                 print(f"   - {table[0]}")
+        # with open(r"db_test_data.sql", encoding="utf-8") as f:
+        #     sql = f.read()
+        # conn.execute(text(sql))
+        # conn.commit()
     return DatabaseResponse.success()
                     
     
