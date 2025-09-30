@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
-from frontend.modals.ViewTableModal.Table import DynamicTable
+from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
 from frontend.shared.ui.filters.FilterBlockClass import FilterBlockClass
 import logging
@@ -63,8 +63,12 @@ class TableControlPanel(Widget):
         self.layout.addWidget(scroll_area)
 
         self.table_widget = DynamicTable()
-        self.table_widget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.table_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.table_widget.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
+        self.table_widget.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
         self.layout.addWidget(self.table_widget)
 
     def _load_table_names(self):
@@ -105,7 +109,7 @@ class TableControlPanel(Widget):
             if len(self.blocks) > 0:  # Если это не первый блок
                 remove_button = PushButton(
                     text="❌",
-                    callback=lambda: self._remove_filter_block(block, block_container)
+                    callback=lambda: self._remove_filter_block(block, block_container),
                 )
                 remove_button.setMaximumWidth(30)
                 block_container.layout.addWidget(remove_button)
@@ -177,7 +181,9 @@ class TableControlPanel(Widget):
             table_name: str = self.blocks[0].get_selected_table()
             response_teble_columns = DatabaseRepository().get_table_columns(table_name)
             if MessageFactory.show_response_message(response_teble_columns, self, True):
-                logger.error(f"Ошибка получения колонок: {response_teble_columns.error}")
+                logger.error(
+                    f"Ошибка получения колонок: {response_teble_columns.error}"
+                )
                 return
 
             table_columns: Dict[str, Dict[str, Any]] = response_teble_columns.data
@@ -189,9 +195,13 @@ class TableControlPanel(Widget):
 
             model: type[Base] = response_model.data
             print(filters, sep="\n\n")
-            response_table_data = DatabaseRepository().get_table_data(table_name, table_columns, filters.get(table_name, ""))
+            response_table_data = DatabaseRepository().get_table_data(
+                table_name, table_columns, filters.get(table_name, "")
+            )
             if MessageFactory.show_response_message(response_table_data, self, True):
-                logger.error(f"Ошибка получения данных таблицы: {response_table_data.error}")
+                logger.error(
+                    f"Ошибка получения данных таблицы: {response_table_data.error}"
+                )
                 return
 
             table_data: Dict[str, Any] = response_table_data.data
@@ -243,7 +253,11 @@ class TableControlPanel(Widget):
                         container = item.widget()
 
                         # Проверяем, содержит ли контейнер наш блок
-                        for j in range(container.layout().count() if hasattr(container, 'layout') else 0):
+                        for j in range(
+                            container.layout().count()
+                            if hasattr(container, "layout")
+                            else 0
+                        ):
                             child_item = container.layout().itemAt(j)
                             if child_item and child_item.widget() == last_block:
                                 self._remove_filter_block(last_block, container)
@@ -260,7 +274,9 @@ class TableControlPanel(Widget):
 
                 # Устанавливаем таблицу
                 current_block.table_combo.setCurrentText(table_name)
-                current_block._on_table_changed(table_name)  # Принудительно обновляем фильтры
+                current_block._on_table_changed(
+                    table_name
+                )  # Принудительно обновляем фильтры
 
                 # Устанавливаем значения фильтров
                 for col_name, value in table_filters.items():
