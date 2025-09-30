@@ -6,7 +6,7 @@ from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.Table import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
-from frontend.shared.ui.FilterBlock import FilterBlockClass
+from frontend.shared.ui.filters.FilterBlockClass import FilterBlockClass
 import logging
 from backend.database.models import Base
 

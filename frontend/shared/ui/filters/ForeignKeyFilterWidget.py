@@ -1,26 +1,33 @@
 from typing import List, Dict, Any, Optional
-from PySide6.QtWidgets import QComboBox
 from PySide6.QtCore import QTimer, Signal
 from backend.repository import DatabaseRepository
+from frontend.shared.ui.inputs import ComboBox, AutoComplete
 from backend.utils.responce_types import ResponseStatus
 from .BaseFilterWidget import BaseFilterWidget
 import logging
 
 logger = logging.getLogger(__name__)
-
+INPUT_CANDIDATES = [
+    "name",
+    "title",
+    "label",
+    "model",
+    "type",
+    "description",
+]
 
 class ForeignKeyFilterWidget(BaseFilterWidget):
     """Виджет фильтра для foreign key с поиском по вводу"""
 
     value_changed = Signal(object)  # Сигнал изменения значения
+    target_table = None
+    target_column = None
+    display_column = None
+    selected_id = None
+    search_timer = None
+    is_updating: bool = False  # Флаг для предотвращения рекурсии
 
     def __init__(self, column_name: str, column_info: Dict[str, Any], parent=None):
-        self.target_table = None
-        self.target_column = None
-        self.display_column = None
-        self.selected_id = None
-        self.search_timer = None
-        self.is_updating = False  # Флаг для предотвращения рекурсии
 
         # Извлекаем информацию о foreign key
         self._extract_foreign_key_info(column_info)
@@ -49,14 +56,7 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
             if columns_resp.status == ResponseStatus.SUCCESS:
                 cols = columns_resp.data
                 # Ищем подходящие текстовые колонки
-                for candidate in [
-                    "name",
-                    "title",
-                    "label",
-                    "model",
-                    "type",
-                    "description",
-                ]:
+                for candidate in INPUT_CANDIDATES:
                     if candidate in cols:
                         col_type = (cols[candidate].get("type") or "").upper()
                         if any(
@@ -71,24 +71,25 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
 
         return display_column
 
-    def _create_input_widget(self) -> QComboBox:
+    def _create_input_widget(self) -> ComboBox:
         """Создает ComboBox для поиска foreign key"""
-        combo = QComboBox()
+        combo = ComboBox()
         combo.setEditable(True)
-        combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        combo.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
 
         # КРИТИЧНО: отключаем автозаполнение
-        combo.setCompleter(None)
-        combo.lineEdit().setProperty("autocomplete", "off")
+        combo.setCompleter(AutoComplete())
+        # combo.lineEdit().setProperty("autocomplete", "off")
 
         # Настройка плейсхолдера
-        combo.lineEdit().setPlaceholderText(f"Поиск в {self.target_table}...")
+        # combo.lineEdit().setPlaceholderText(f"Поиск в {self.target_table}...")
 
         return combo
 
     def _setup_connections(self):
         """Настраивает соединения сигналов"""
         if not self.input_widget:
+            logger.error("Нет инпута", self)
             return
 
         # Таймер для debounce поиска

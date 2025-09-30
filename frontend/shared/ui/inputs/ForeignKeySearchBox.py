@@ -1,8 +1,8 @@
-from PySide6.QtWidgets import QCompleter
 from PySide6.QtCore import QTimer
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
-from frontend.shared.ui import ComboBox, Widget, HLayout
+from frontend.shared.ui.inputs import AutoComplete, ComboBox
+from frontend.shared.ui import Widget, HLayout
 
 
 class ForeignKeySearchBox(Widget):
@@ -13,7 +13,7 @@ class ForeignKeySearchBox(Widget):
         self.id_column = id_column
 
         self.combo = ComboBox()
-        self.combo.setCompleter(QCompleter())
+        self.combo.setCompleter(AutoComplete())
         self.combo.setEditable(True)
         self.combo.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
         self.layout.addWidget(self.combo)
@@ -41,7 +41,7 @@ class ForeignKeySearchBox(Widget):
             display_col=self.display_column,
             id_col=self.id_column,
             query=text,
-            limit=30
+            limit=30,
         )
         if results.data:
             self.combo.blockSignals(True)
@@ -57,7 +57,7 @@ class ForeignKeySearchBox(Widget):
                 display_col=self.display_column,
                 id_col=self.id_column,
                 query="",  # пустой запрос → можно вернуть первые N
-                limit=10
+                limit=10,
             )
             if resp.status == ResponseStatus.SUCCESS:
                 for item in resp.data:
