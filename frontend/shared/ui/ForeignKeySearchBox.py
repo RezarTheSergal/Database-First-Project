@@ -43,12 +43,12 @@ class ForeignKeySearchBox(Widget):
             query=text,
             limit=30
         )
-
-        self.combo.blockSignals(True)
-        self.combo.clear()
-        for item in results:
-            self.combo.addItem(item[self.display_column], item[self.id_column])
-        self.combo.blockSignals(False)
+        if results.data:
+            self.combo.blockSignals(True)
+            self.combo.clear()
+            for item in results.data:
+                self.combo.addItem(item[self.display_column], item[self.id_column])
+            self.combo.blockSignals(False)
 
     def on_focus(self):
         if self.combo.count() == 0:

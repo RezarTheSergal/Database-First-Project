@@ -1,10 +1,20 @@
 from abc import abstractmethod
 from typing import Any, Dict
 from frontend.shared.ui import HLayout, Text, Widget
+from frontend.shared.ui.inputs import (
+    StringInput,
+    IntInput,
+    BoolInput,
+    ComboBox,
+    FloatInput,
+    DateInput,
+)
 
 
 class BaseFilterWidget(Widget):
     """Базовый класс для всех типов фильтров"""
+
+    input_widget: StringInput | IntInput | BoolInput | ComboBox | FloatInput | DateInput
 
     def __init__(
         self,
@@ -32,7 +42,7 @@ class BaseFilterWidget(Widget):
             self.layout.addWidget(self.input_widget)
 
     @abstractmethod
-    def _create_input_widget(self) -> Widget:
+    def _create_input_widget(self) -> Any:
         """Создает виджет ввода для конкретного типа фильтра"""
         pass
 

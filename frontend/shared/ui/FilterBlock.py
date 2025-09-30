@@ -3,8 +3,8 @@ from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
-from frontend.shared.ui.filters.factory import FilterWidgetFactory
-from frontend.shared.ui.filters.base import BaseFilterWidget
+from frontend.shared.ui.filters.FilterWidgetFactory import FilterWidgetFactory
+from frontend.shared.ui.filters.BaseFilterWidget import BaseFilterWidget
 import logging
 
 logger = logging.getLogger()

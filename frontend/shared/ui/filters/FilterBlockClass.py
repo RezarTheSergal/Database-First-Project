@@ -3,8 +3,8 @@ from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
-from filters.factory import FilterWidgetFactory
-from filters.base import BaseFilterWidget
+from frontend.shared.ui.filters.FilterWidgetFactory import FilterWidgetFactory
+from frontend.shared.ui.filters.BaseFilterWidget import BaseFilterWidget
 import logging
 
 logger = logging.getLogger()
@@ -44,22 +44,28 @@ class FilterBlockClass(Widget):
 
         columns_info = self._get_columns_info(table_name)
         if not columns_info:
-            logger.warning(f"Не удалось получить информацию о колонках для таблицы {table_name}")
+            logger.warning(
+                f"Не удалось получить информацию о колонках для таблицы {table_name}"
+            )
             return
 
         # Создаем фильтры для каждой колонки
         for col_name, col_meta in columns_info.items():
             try:
-                filter_widget = FilterWidgetFactory.create_filter_widget(col_name, col_meta)
+                filter_widget = FilterWidgetFactory.create_filter_widget(
+                    col_name, col_meta
+                )
 
                 if filter_widget:
                     self.filter_widgets[col_name] = filter_widget
                     self.filters_container.layout.addWidget(filter_widget)
 
                     # Подключаем сигналы если нужно
-                    if hasattr(filter_widget, 'value_changed'):
+                    if hasattr(filter_widget, "value_changed"):
                         filter_widget.value_changed.connect(
-                            lambda value, col=col_name: self._on_filter_value_changed(col, value)
+                            lambda value, col=col_name: self._on_filter_value_changed(
+                                col, value
+                            )
                         )
 
             except Exception as e:
@@ -73,11 +79,15 @@ class FilterBlockClass(Widget):
             if response.status == ResponseStatus.SUCCESS and response.data:
                 return response.data
             else:
-                logger.error(f"Ошибка получения колонок для таблицы {table_name}: {response.error}")
+                logger.error(
+                    f"Ошибка получения колонок для таблицы {table_name}: {response.error}"
+                )
                 return None
 
         except Exception as e:
-            logger.error(f"Исключение при получении колонок для таблицы {table_name}: {e}")
+            logger.error(
+                f"Исключение при получении колонок для таблицы {table_name}: {e}"
+            )
             return None
 
     def _on_filter_value_changed(self, column_name: str, value: Any):
@@ -123,7 +133,7 @@ class FilterBlockClass(Widget):
             filter_widget = self.filter_widgets[column_name]
 
             # Для FK фильтров передаем дополнительную информацию
-            if hasattr(filter_widget, 'set_value'):
+            if hasattr(filter_widget, "set_value"):
                 filter_widget.set_value(value, display_text)
             else:
                 # Для простых фильтров (пока не реализовано)
