@@ -10,4 +10,4 @@ class AddEntryModal(Modal):
         self.setMinimumSize(Size(600, 500))
         self.setMaximumSize(Size(2000, 1000))
 
-        self.add_children([AddEntryForm()])
+        self.layout.add_children([AddEntryForm()])

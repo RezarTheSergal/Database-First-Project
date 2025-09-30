@@ -22,7 +22,7 @@ class AddEntryForm(Widget):
         self.inputs_container = Widget(VLayout())
         self.submit_button = PushButton("Подтвердить", callback=self._request_entry_PUT)
 
-        self.set_children(
+        self.layout.set_children(
             [self.table_name_combo_box, self.inputs_container, self.submit_button]
         )
 
@@ -37,17 +37,18 @@ class AddEntryForm(Widget):
         MessageFactory.show_response_message(response, self, True)
 
         if got_columns(response):
-            MessageFactory._show_error(DatabaseResponse(
-                        status=ResponseStatus.ERROR, 
-                        message=f"Колонки не были получены {response.error}"
-                        ), 
-                        self
-                    )
+            MessageFactory._show_error(
+                DatabaseResponse(
+                    status=ResponseStatus.ERROR,
+                    message=f"Колонки не были получены {response.error}",
+                ),
+                self,
+            )
             logger.error("Колонки не были получены", response.error)
             return
         else:
             logger.info([x["type"] for x in response.data.values()])  # type: ignore
-            self.inputs_container.clean()
+            self.inputs_container.layout.clean()
 
         columns: dict = response.data  # type: ignore
         pprint(columns)
@@ -62,11 +63,12 @@ class AddEntryForm(Widget):
                 input = child.input
 
                 if not isinstance(input, ComboBox) and not input.is_value_valid():
-                    MessageFactory._show_error(DatabaseResponse(
-                        status=ResponseStatus.ERROR, 
-                        message=f"Предоставленное значение {label_text} инвалидно! (Внести: '{input.text()}')"
-                        ), 
-                        self
+                    MessageFactory._show_error(
+                        DatabaseResponse(
+                            status=ResponseStatus.ERROR,
+                            message=f"Предоставленное значение {label_text} инвалидно! (Внести: '{input.text()}')",
+                        ),
+                        self,
                     )
                     logger.error(
                         f"Given value of {label_text} is invalid! (input: '{input.text()}')"
@@ -104,4 +106,4 @@ class AddEntryForm(Widget):
             row = FormRow(input, key, translate(key))
             rows.append(row)
 
-        self.inputs_container.set_children(rows)
+        self.inputs_container.layout.set_children(rows)

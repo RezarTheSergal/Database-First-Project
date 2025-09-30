@@ -1,15 +1,8 @@
 # frontend/widgets/DynamicTable.py
 
 from typing import List, Dict, Any, Optional
-from PySide6.QtWidgets import (
-    QTableWidget, QTableWidgetItem, QWidget, QHBoxLayout, QComboBox,
-    QDateEdit, QDoubleSpinBox, QSpinBox, QLineEdit, QCheckBox
-)
-from PySide6.QtCore import Qt, QDate
-from PySide6.QtGui import QBrush, QColor
-from sqlalchemy import inspect
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from sqlalchemy.orm import DeclarativeBase
-
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import SizeAdjustPolicy, Size
@@ -24,17 +17,18 @@ class DynamicTable(QTableWidget):
     Универсальная таблица для отображения и редактирования данных любой SQLAlchemy-модели.
     Поддерживает все типы колонок из твоей модели: FK, ENUM, Date, Numeric и т.д.
     """
+    _model_class: Optional[type[DeclarativeBase]] = None
+    _column_info: dict[str, Any] = {}  # {col_name: col_metadata}
+    _foreign_key_data: dict[str, list[tuple[str, Any]]] = (
+        {}
+    )  # {col_name: [(id, display), ...]}
+    _enum_values: dict[str, list[Any]] = {}  # {col_name: [values]}
 
     def __init__(self, model_class: Optional[type[DeclarativeBase]] = None):
         super().__init__()
         self.setMaximumSize(Size(1800, 900))
         self.setSizeAdjustPolicy(SizeAdjustPolicy.AdjustToContents)
         self.setSortingEnabled(True)
-        
-        self._model_class = None
-        self._column_info = {}  # {col_name: col_metadata}
-        self._foreign_key_data = {}  # {col_name: [(id, display), ...]}
-        self._enum_values = {}  # {col_name: [values]}
 
         if model_class:
             self.set_model(model_class)
@@ -43,13 +37,13 @@ class DynamicTable(QTableWidget):
         """Устанавливает модель SQLAlchemy и настраивает колонки"""
         self._model_class = model_class
         table_name = model_class.__tablename__
-        
+
         # Получаем метаданные колонок
         repo = DatabaseRepository()
         col_resp = repo.get_table_columns(table_name)
         if col_resp.status != ResponseStatus.SUCCESS:
             raise ValueError(f"Не удалось загрузить колонки для {table_name}: {col_resp.message}")
-        
+
         self._column_info = col_resp.data
         self._setup_columns()
         self._preload_foreign_key_data()
@@ -67,10 +61,10 @@ class DynamicTable(QTableWidget):
                 fk = info["foreign_keys"][0]
                 target_table = fk["target_table"]
                 target_col = fk["target_column"]
-                
+
                 # Определяем display колонку
                 display_col = self._get_display_column_for_table(target_table)
-                
+
                 # Загружаем данные
                 repo = DatabaseRepository()
                 resp = repo.get_table_data(
@@ -78,7 +72,7 @@ class DynamicTable(QTableWidget):
                     columns_list=[target_col, display_col] if display_col != target_col else [target_col],
                     limit=100  # только если мало записей
                 )
-                if resp.status == ResponseStatus.SUCCESS:
+                if resp.status == ResponseStatus.SUCCESS and resp.data:
                     items = []
                     for row in resp.data:
                         id_val = row[target_col]
@@ -92,18 +86,20 @@ class DynamicTable(QTableWidget):
         col_resp = repo.get_table_columns(table_name)
         if col_resp.status != ResponseStatus.SUCCESS:
             return "id"  # fallback
-        
+
         cols = col_resp.data
         candidates = ["name", "title", "label", "model", "type", "flavor"]
         for cand in candidates:
-            if cand in cols:
+            if isinstance(cols, dict) and cand in cols:
                 col_type = (cols[cand].get("type") or "").upper()
                 if any(t in col_type for t in ("TEXT", "VARCHAR", "CHAR", "STRING")):
                     return cand
-        # Если не нашли — возвращаем первую текстовую колонку или id
-        for name, info in cols.items():
-            if "TEXT" in (info.get("type") or "").upper():
-                return name
+
+        if isinstance(cols, dict):
+            # Если не нашли — возвращаем первую текстовую колонку или id
+            for name, info in cols.items():
+                if "TEXT" in (info.get("type") or "").upper():
+                    return name
         return list(cols.keys())[0] if cols else "id"
 
     def load_data(self, data: List[Dict[str, Any]]):
@@ -124,7 +120,7 @@ class DynamicTable(QTableWidget):
         """Создаёт QTableWidgetItem с правильным отображением значения"""
         if value is None:
             return QTableWidgetItem("")
-        
+
         col_info = self._column_info[col_name]
         col_type = (col_info.get("type") or "").upper()
 
@@ -157,7 +153,7 @@ class DynamicTable(QTableWidget):
 
             col_info = self._column_info[col_name]
             display_text = item.text()
-            
+
             # Преобразуем обратно в значение
             if col_info.get("foreign_keys"):
                 # Ищем ID по display тексту

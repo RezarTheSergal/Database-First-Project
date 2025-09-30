@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
             callback=lambda: self.open_modal(self.view_table_modal),
         )
 
-        self.widget.set_children(
+        self.widget.layout.set_children(
             [h1, hr, create_scheme_btn, add_entry_btn, view_table_btn]
         )
 
