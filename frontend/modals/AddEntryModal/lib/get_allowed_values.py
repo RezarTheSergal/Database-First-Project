@@ -2,7 +2,7 @@ from backend.utils.logger import logging
 
 logger = logging.getLogger("frontend")
 
-
+# QwQ мощно конечно, но..
 def get_allowed_values(table: str, name: str) -> list[str]:
     if table == "sensors":
         if name == "type":
