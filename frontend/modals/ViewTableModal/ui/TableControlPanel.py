@@ -6,7 +6,7 @@ from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
-from frontend.shared.ui.filters.FilterBlockClass import FilterBlockClass
+from frontend.shared.ui.filters.FilterBlockWidget import FilterBlockWidget
 import logging
 from backend.database.models import Base
 
@@ -21,7 +21,7 @@ class TableControlPanel(Widget):
 
     def __init__(self):
         super().__init__(VLayout())
-        self.blocks: List[FilterBlockClass] = []
+        self.blocks: List[FilterBlockWidget] = []
         self.table_names = []
 
         self._setup_ui()
@@ -97,7 +97,7 @@ class TableControlPanel(Widget):
     def _add_filter_block(self):
         """Добавляет новый блок фильтров"""
         try:
-            block = FilterBlockClass(initial_tables=self.table_names)
+            block = FilterBlockWidget(initial_tables=self.table_names)
 
             # Создаем контейнер для блока с кнопкой удаления
             block_container = Widget(HLayout())
@@ -130,7 +130,7 @@ class TableControlPanel(Widget):
             )
             logger.error(f"Ошибка добавления блока фильтров: {e}")
 
-    def _remove_filter_block(self, block: FilterBlockClass, container: QWidget):
+    def _remove_filter_block(self, block: FilterBlockWidget, container: QWidget):
         """Удаляет блок фильтров"""
         try:
             # Удаляем из списка

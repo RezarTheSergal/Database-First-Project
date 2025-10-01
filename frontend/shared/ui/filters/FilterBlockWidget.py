@@ -3,15 +3,16 @@ from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
-from frontend.shared.ui.filters.FilterWidgetFactory import FilterWidgetFactory
-from frontend.shared.ui.filters.BaseFilterWidget import BaseFilterWidget
+from .ui.FilterWidgetFactory import FilterWidgetFactory
+from .ui.BaseFilterWidget import BaseFilterWidget
+from .lib.set_filter_value import set_filter_value
 import logging
 
 logger = logging.getLogger()
 database = DatabaseRepository()
 
 
-class FilterBlockClass(Widget):
+class FilterBlockWidget(Widget):
     def __init__(self, initial_tables=None, parent: None | Widget = None):
         super().__init__(HLayout())
         if parent != None:
@@ -58,6 +59,9 @@ class FilterBlockClass(Widget):
 
                 if filter_widget:
                     self.filter_widgets[col_name] = filter_widget
+                    # Add the filter widget directly to the container layout
+                    # Since each filter widget is a Widget with its own layout,
+                    # we can add it directly
                     self.filters_container.layout.addWidget(filter_widget)
 
                     # Подключаем сигналы если нужно
@@ -132,9 +136,8 @@ class FilterBlockClass(Widget):
         if column_name in self.filter_widgets:
             filter_widget = self.filter_widgets[column_name]
 
-            # Для FK фильтров передаем дополнительную информацию
-            if hasattr(filter_widget, "set_value"):
-                filter_widget.set_value(value, display_text)  # type: ignore
-            else:
-                # Для простых фильтров (пока не реализовано)
-                pass
+            # Если передан display_text, обновляем метку
+            if display_text:
+                filter_widget.label.setText(display_text + ":")
+
+            set_filter_value(filter_widget, value)

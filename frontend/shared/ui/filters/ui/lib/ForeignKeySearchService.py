@@ -19,10 +19,10 @@ class ForeignKeySearchService:
             limit=limit,
         )
 
-        if response.status != ResponseStatus.SUCCESS:
+        if response.status == ResponseStatus.SUCCESS and response.data:
+            return response.data
+        else:
             raise Exception(f"Search failed: {response.error}")
-
-        return response.data
 
     def get_display_value(
         self, table: str, display_col: str, id_col: str, id_value: Any

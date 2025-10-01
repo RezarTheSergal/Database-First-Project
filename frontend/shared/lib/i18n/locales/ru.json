@@ -26,7 +26,7 @@
     "recommendation": "Рекомендация",
     "sale_date": "Дата продажи",
     "quantity_sold": "Количество, шт.",
-    "total_price": "Суммарная цена, руб.",
+    "total_price": "Суммарная прибыль, руб.",
     "client": "Заказчик",
     "technician": "Обслуживающий",
     "date": "Дата",
@@ -45,5 +45,6 @@
     "quantity_in_stock": "В наличии, шт.",
     "sensor_id": "ID сенсора",
     "equipment_id": "ID оборудования",
-    "product_id": "ID товара"
+    "product_id": "ID товара",
+    "caffeine_level": "Уровень коффеина"
 }
