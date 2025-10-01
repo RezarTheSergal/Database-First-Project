@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit, QCheckBox
-from .lib.isNull import isNull
+from .lib.is_null import is_null
 
 
 class BoolInput(QLineEdit):
@@ -10,7 +10,7 @@ class BoolInput(QLineEdit):
         return bool(self.text())
 
     def is_value_valid(self) -> bool:
-        if not self.is_nullable and isNull(self.text()):
+        if not self.is_nullable and is_null(self.text()):
             return False
         return True
 

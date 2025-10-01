@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import QSpinBox
-from PySide6.QtGui import QIntValidator
-from .lib.isNull import isNull
+from .lib.is_null import is_null
 
 class IntInput(QSpinBox):
     is_nullable: bool
@@ -34,7 +33,7 @@ class IntInput(QSpinBox):
         return int(self.text())
 
     def is_value_valid(self):
-        if not self.is_nullable and isNull(self.text()):
+        if not self.is_nullable and is_null(self.text()):
             return False
         elif not self.can_be_negative and int(self.text()) < 0:
             return False

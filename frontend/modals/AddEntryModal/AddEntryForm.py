@@ -5,7 +5,7 @@ from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.lib import translate
 from frontend.utils.MessageFactory import MessageFactory
-from .lib import get_allowed_values, got_columns, get_element_by_type, is_foreign_key
+from .lib import got_columns, get_element_by_type, is_foreign_key
 from pprint import pprint
 
 logger = logging.getLogger(__name__)
@@ -83,22 +83,20 @@ class AddEntryForm(Widget):
 
     def _setup_form_rows(self, columns: dict):
         rows = []
-        table = self.table_name_combo_box.get_value()
+        # target_table = self.table_name_combo_box.get_value()
 
         for [key, data] in columns.items():
             if data["primary_key"]:
                 continue
 
-            name = data["name"]
-            if is_foreign_key(data["name"]):
+            [column_name,column_type] = data["name"],data["type"]
+            if is_foreign_key(column_name):
                 input = ComboBox()
             else:
-                input = get_element_by_type(data["type"])
+                input = get_element_by_type(column_type)
 
             if not isinstance(input, ComboBox):
                 input.is_nullable = data["nullable"]
-            else:
-                input.set_items(get_allowed_values(table, name))
 
             if isinstance(input, (IntInput, FloatInput)):
                 input.can_be_negative = False  # FIXME: Проверять check_constraints

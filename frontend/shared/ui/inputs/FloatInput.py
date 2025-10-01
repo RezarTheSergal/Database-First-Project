@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QDoubleSpinBox
-from .lib.isNull import isNull
+from .lib.is_null import is_null
 
 
 class FloatInput(QDoubleSpinBox):
@@ -33,7 +33,7 @@ class FloatInput(QDoubleSpinBox):
         return float(self.text())
 
     def is_value_valid(self) -> bool:
-        if not self.is_nullable and isNull(self.text()):
+        if not self.is_nullable and is_null(self.text()):
             return False
         elif not self.can_be_negative and float(self.text()) < 0:
             return False

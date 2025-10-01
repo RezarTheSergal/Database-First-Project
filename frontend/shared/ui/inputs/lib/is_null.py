@@ -1,2 +1,2 @@
-def isNull(value: str | None) -> bool:
+def is_null(value: str | None) -> bool:
     return value is None or value == ""

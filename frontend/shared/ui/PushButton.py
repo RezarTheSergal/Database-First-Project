@@ -11,8 +11,8 @@ class PushButton(QPushButton):
     ):
         super().__init__()
         self.setText(text)
-        if icon != None:
-            self.setIcon(icon)
 
-        if callback != None:
+        if icon is not None:
+            self.setIcon(icon)
+        if callback is not None:
             self.clicked.connect(callback)

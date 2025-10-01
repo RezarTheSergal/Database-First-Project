@@ -10,5 +10,5 @@ class Timer(QTimer):
     ):
         super().__init__()
         self.setSingleShot(is_singleshot)
-        if on_timeout != None:
+        if on_timeout is not None:
             self.timeout.connect(on_timeout)

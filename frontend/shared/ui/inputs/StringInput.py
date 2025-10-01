@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit
-from .lib.isNull import isNull
+from .lib.is_null import is_null
 
 
 class StringInput(QLineEdit):
@@ -10,7 +10,7 @@ class StringInput(QLineEdit):
         self.setMaxLength(max_input_length)
 
     def is_value_valid(self):
-        if not self.is_nullable and isNull(self.text()):
+        if not self.is_nullable and is_null(self.text()):
             return False
         return True
 
