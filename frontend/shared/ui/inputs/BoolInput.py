@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit, QCheckBox
-from .isNull import isNull
+from .lib.isNull import isNull
 
 
 class BoolInput(QLineEdit):

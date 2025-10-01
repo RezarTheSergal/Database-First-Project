@@ -4,7 +4,7 @@ from .DateInput import DateInput
 from .FloatInput import FloatInput
 from .IntInput import IntInput
 from .StringInput import StringInput
-from .AutoComplete import AutoComplete
+from .utils.AutoComplete import AutoComplete
 from .ForeignKeySearchBox import ForeignKeySearchBox
 
 __all__ = [

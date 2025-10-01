@@ -5,9 +5,9 @@ from .Alignment import Alignment
 from .text.Font import Font
 from .text.Text import Text
 from .Gradients import LinearGradient, RadialGradient
-from .Point import Point
+from .utils.Point import Point
 from .Modal import Modal
-from .Size import Size
+from .utils.Size import Size
 from .text.H1 import H1
 from .Spinner import Spinner
 from .Widget import Widget

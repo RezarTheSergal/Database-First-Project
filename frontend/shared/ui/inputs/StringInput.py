@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit
-from .isNull import isNull
+from .lib.isNull import isNull
 
 
 class StringInput(QLineEdit):

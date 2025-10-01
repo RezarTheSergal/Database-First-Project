@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QDateEdit
-from .lib.DateTime import DateTime
-from .lib.Date import Date
-from .lib.Time import Time
+from .utils.DateTime import DateTime
+from .utils.Date import Date
+from .utils.Time import Time
 
 
 class DateInput(QDateEdit):

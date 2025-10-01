@@ -1,4 +1,4 @@
-from .Size import Size
+from .utils.Size import Size
 from .Icon import Icon
 from .Layouts import VLayout
 from .Widget import Widget

@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QSpinBox
-from .isNull import isNull
+from .lib.isNull import isNull
 
 class IntInput(QSpinBox):
     is_nullable: bool

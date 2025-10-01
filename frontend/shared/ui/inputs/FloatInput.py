@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QDoubleSpinBox
-from .isNull import isNull
+from .lib.isNull import isNull
 
 
 class FloatInput(QDoubleSpinBox):
