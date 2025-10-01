@@ -7,11 +7,13 @@ from backend.utils.database_exception_handler import DatabaseErrorHandler
 
 class Singleton(type):
     _instances = {}
+
     def __call__(self, *args, **kwds):
         if self not in self._instances:
             instance = super().__call__(*args, **kwds)
             self._instances[self] = instance
         return self._instances[self]
+
 
 class Database(metaclass=Singleton):
     def __init__(self):
@@ -19,7 +21,9 @@ class Database(metaclass=Singleton):
         self._pg_config = PgConfig()
         # Создание движка и фабрики сессий
         self._engine = self.create_database_engine()
-        self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
+        self._SessionLocal = sessionmaker(
+            autocommit=False, autoflush=False, bind=self._engine
+        )
 
     @DatabaseErrorHandler()
     def create_database_engine(self) -> Engine:
@@ -27,18 +31,16 @@ class Database(metaclass=Singleton):
         Создание движка SQLAlchemy с использованием настроек PgConfig
         """
         database_url = self._pg_config.database_url()
-        
+
         engine = create_engine(
             database_url,
-            echo=self._pg_config.echo if hasattr(self._pg_config, 'echo') else False,
+            echo=self._pg_config.echo if hasattr(self._pg_config, "echo") else False,  # type: ignore
             pool_size=10,
             max_overflow=20,
-            pool_pre_ping=True  # Проверка соединений перед использованием
+            pool_pre_ping=True,  # Проверка соединений перед использованием
         )
-        
+
         return engine
-
-
 
     @contextmanager
     @DatabaseErrorHandler()
@@ -68,4 +70,3 @@ class Database(metaclass=Singleton):
         Получить URL базы данных из PgConfig
         """
         return self._pg_config.database_url()
-    

@@ -51,7 +51,7 @@ class TableControlPanel(Widget):
 
         self.layout.addLayout(title_layout)
 
-        # Скроллируемый контейнер для блоков фильтров
+        # Контейнер со скроллом для блоков фильтров
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
@@ -160,7 +160,7 @@ class TableControlPanel(Widget):
         """Очищает все фильтры во всех блоках"""
         try:
             for block in self.blocks:
-                block.reset_filters()
+                block.reset_filters()  # type: ignore
 
             logger.info("Все фильтры очищены")
             self._apply_filters()
@@ -179,24 +179,24 @@ class TableControlPanel(Widget):
         try:
             filters = self.get_all_filters()
             table_name: str = self.blocks[0].get_selected_table()
-            response_teble_columns = DatabaseRepository().get_table_columns(table_name)
-            if MessageFactory.show_response_message(response_teble_columns, self, True):
+            response_table_columns = DatabaseRepository().get_table_columns(table_name)
+            if MessageFactory.show_response_message(response_table_columns, self, True):
                 logger.error(
-                    f"Ошибка получения колонок: {response_teble_columns.error}"
+                    f"Ошибка получения колонок: {response_table_columns.error}"
                 )
                 return
 
-            table_columns: Dict[str, Dict[str, Any]] = response_teble_columns.data
+            table_columns: Dict[str, Dict[str, Any]] = response_table_columns.data  # type: ignore
 
             response_model = DatabaseRepository().get_model_by_tablename(table_name)
             if MessageFactory.show_response_message(response_model, self, True):
                 logger.error(f"Ошибка получения модели бд: {response_model.error}")
                 return
 
-            model: type[Base] = response_model.data
-            print(filters, sep="\n\n")
+            model: type[Base] = response_model.data  # type: ignore
+            # print(filters, sep="\n\n")
             response_table_data = DatabaseRepository().get_table_data(
-                table_name, table_columns, filters.get(table_name, "")
+                table_name, table_columns, filters.get(table_name, "")  # type: ignore
             )
             if MessageFactory.show_response_message(response_table_data, self, True):
                 logger.error(
@@ -204,9 +204,9 @@ class TableControlPanel(Widget):
                 )
                 return
 
-            table_data: Dict[str, Any] = response_table_data.data
+            table_data: Dict[str, Any] = response_table_data.data  # type: ignore
 
-            self.table_widget.set_model(model)
+            self.table_widget.set_model(model)  # type: ignore
             self.table_widget.load_data([table_data])
             logger.info(f"Применены фильтры: {filters}")
 
@@ -254,11 +254,11 @@ class TableControlPanel(Widget):
 
                         # Проверяем, содержит ли контейнер наш блок
                         for j in range(
-                            container.layout().count()
+                            container.layout().count()  # type: ignore
                             if hasattr(container, "layout")
                             else 0
                         ):
-                            child_item = container.layout().itemAt(j)
+                            child_item = container.layout().itemAt(j)  # type: ignore
                             if child_item and child_item.widget() == last_block:
                                 self._remove_filter_block(last_block, container)
                                 break

@@ -62,7 +62,7 @@ class FilterBlockClass(Widget):
 
                     # Подключаем сигналы если нужно
                     if hasattr(filter_widget, "value_changed"):
-                        filter_widget.value_changed.connect(
+                        filter_widget.value_changed.connect(  # type: ignore
                             lambda value, col=col_name: self._on_filter_value_changed(
                                 col, value
                             )
@@ -134,7 +134,7 @@ class FilterBlockClass(Widget):
 
             # Для FK фильтров передаем дополнительную информацию
             if hasattr(filter_widget, "set_value"):
-                filter_widget.set_value(value, display_text)
+                filter_widget.set_value(value, display_text)  # type: ignore
             else:
                 # Для простых фильтров (пока не реализовано)
                 pass

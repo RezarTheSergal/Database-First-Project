@@ -13,9 +13,8 @@ from .Spinner import Spinner
 from .Widget import Widget
 from .SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
-from .inputs import StringInput
-from .inputs.ComboBox import ComboBox
 from .PromptBox import PromptBox
+from .Timer import Timer
 
 __all__ = [
     "PushButton",
@@ -36,7 +35,6 @@ __all__ = [
     "SizeAdjustPolicy",
     "H1",
     "Hr",
-    "StringInput",
-    "ComboBox",
     "PromptBox",
+    "Timer",
 ]

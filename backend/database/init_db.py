@@ -6,7 +6,7 @@
 import sys
 import logging
 from pathlib import Path
-from sqlalchemy import create_engine, text, inspect 
+from sqlalchemy import create_engine, text, inspect
 from backend.utils.database_exception_handler import DatabaseErrorHandler
 from backend.utils.responce_types import DatabaseResponse, ErrorCode
 # Добавляем путь для импортов
@@ -25,32 +25,33 @@ def create_database_if_not_exists() -> DatabaseResponse:
     """Создает базу данных, если она не существует"""
 
     pg_config = PgConfig()
-        
+
     # Используем правильные атрибуты из PgConfig
-    db_name = pg_config.dbname 
-    db_user = pg_config.user  
-    creational_url = f"postgresql+psycopg2://{db_user}:{pg_config.password}@{pg_config.host}:{pg_config.port}/postgres"
-    creational_engine = create_engine(creational_url, isolation_level='AUTOCOMMIT')
+    db_name = pg_config.dbname
+    db_user = pg_config.user
+    creation_url = f"postgresql+psycopg2://{db_user}:{pg_config.password}@{pg_config.host}:{pg_config.port}/postgres"
+    creation_engine = create_engine(creation_url, isolation_level="AUTOCOMMIT")
 
     # Проверяем существование базы данных
-    with creational_engine.connect() as conn:
-        result = conn.execute(text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'"))
+    with creation_engine.connect() as conn:
+        result = conn.execute(
+            text(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'")
+        )
         exists = result.scalar()
-            
+
         if not exists:
             logger.info(f"Создание базы данных '{db_name}'...")
             conn.execute(text(f"CREATE DATABASE {db_name}"))
             logger.info(f"База данных '{db_name}' успешно создана")
-                
+
             # Даем права пользователю
             conn.execute(text(f"GRANT ALL PRIVILEGES ON DATABASE {db_name} TO {db_user}"))
             logger.info(f"Права доступа предоставлены пользователю '{db_user}'")
         else:
             logger.info(f"База данных '{db_name}' уже существует")
-                
+
     return DatabaseResponse.success()
 
-    
 
 @DatabaseErrorHandler()
 def create_tables() -> DatabaseResponse:
@@ -68,13 +69,17 @@ def create_tables() -> DatabaseResponse:
 
     # Выводим список созданных таблиц
     with db_engine.connect() as conn:
-        result = conn.execute(text("""
-            SELECT table_name 
-            FROM information_schema.tables 
+        result = conn.execute(
+            text(
+                """
+            SELECT table_name
+            FROM information_schema.tables
             WHERE table_schema = 'public'
             ORDER BY table_name
-        """))
-            
+        """
+            )
+        )
+
         tables = result.fetchall()
         if tables:
             logger.info("Список созданных таблиц:")
@@ -85,8 +90,8 @@ def create_tables() -> DatabaseResponse:
         # conn.execute(text(sql))
         # conn.commit()
     return DatabaseResponse.success()
-                    
-    
+
+
 @DatabaseErrorHandler()
 def init_database() -> DatabaseResponse:
     """
@@ -103,7 +108,7 @@ def init_database() -> DatabaseResponse:
             message="Не удалось создать базу данных",
             error_details=created_db.get("error_details", {})
         )
-    
+
     created_tables = create_tables().to_dict()
     # Создаем таблицы
     if created_tables.get("status", "success") == "error":
@@ -112,6 +117,6 @@ def init_database() -> DatabaseResponse:
             message="Не удалось создать таблицы",
             error_details=created_tables.get("error_details", {})
         )
-    
+
     logger.info("База данных успешно инициализирована!")
     return DatabaseResponse.success()

@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from backend.utils.responce_types import ResponseStatus
 from frontend.modals.AddEntryModal.FormRow import FormRow
-from frontend.shared.ui import ComboBox, Widget, PushButton, VLayout
+from frontend.shared.ui import Widget, PushButton, VLayout
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.lib import translate
