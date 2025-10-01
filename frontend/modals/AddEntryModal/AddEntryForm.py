@@ -86,7 +86,7 @@ class AddEntryForm(Widget):
         table = self.table_name_combo_box.get_value()
 
         for [key, data] in columns.items():
-            if data["primary_key"] == True:
+            if data["primary_key"]:
                 continue
 
             name = data["name"]

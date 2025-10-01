@@ -1,7 +1,7 @@
 from PySide6.QtCore import Signal
 from typing import Any, Dict
 from frontend.shared.ui import HLayout, Widget
-from frontend.shared.ui.text.Text import Text  # Assuming you have a Text widget
+from frontend.shared.ui.text.Text import Text
 from frontend.shared.lib.i18n.i18n import translate
 
 
@@ -60,7 +60,7 @@ class BaseFilterWidget(Widget):
         self._value = value
         self._update_ui_value(value)
 
-    def is_empty(self):
+    def is_empty(self) -> bool: # type: ignore
         pass
 
     def clear_value(self):

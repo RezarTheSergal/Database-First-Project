@@ -15,7 +15,7 @@ database = DatabaseRepository()
 class FilterBlockWidget(Widget):
     def __init__(self, initial_tables=None, parent: None | Widget = None):
         super().__init__(HLayout())
-        if parent != None:
+        if parent is not None:
             self.setParent(parent)
 
         # Основной layout
