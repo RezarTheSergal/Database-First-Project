@@ -5,8 +5,29 @@ from .isNull import isNull
 class FloatInput(QDoubleSpinBox):
     is_nullable: bool
     can_be_negative: bool
-    min: float
-    max: float
+    min_val: float | None
+    max_val: float | None
+    step: float
+
+    def __init__(
+        self,
+        min_val: float | None = None,
+        max_val: float | None = None,
+        step: float = 0.1,
+        can_be_negative: bool = False,
+    ):
+        super().__init__()
+        self.setMaximum(max_val or 1000000)
+        if can_be_negative:
+            self.setMinimum(min_val or -1000000)
+        else:
+            self.setMinimum(min_val or 0)
+        self.setSingleStep(step)
+
+        self.min_val = min_val
+        self.max_val = max_val
+        self.step = step
+        self.can_be_negative = can_be_negative
 
     def get_value(self) -> float:
         return float(self.text())
