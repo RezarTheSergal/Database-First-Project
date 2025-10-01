@@ -2,7 +2,6 @@
     "flavor": "Вкус",
     "name": "Название",
     "description": "Описание",
-    "localtion": "Место",
     "unit": "Мера измерения",
     "temperature": "Температура",
     "noise": "Шум",
@@ -40,11 +39,15 @@
     "sales": "Продажи",
     "sensor_readings": "Замеры датчиков",
     "failure_predictions": "Предсказания неудачной партии",
+    "maintenance_logs": "Логи техобслуживания",
     "maintance_logs": "Логи техобслуживания",
     "quantity_produced": "Количество",
     "quantity_in_stock": "В наличии, шт.",
     "sensor_id": "ID сенсора",
     "equipment_id": "ID оборудования",
     "product_id": "ID товара",
-    "caffeine_level": "Уровень коффеина"
+    "caffeine_level": "Уровень кофеина",
+    "sale_id": "ID Продажи",
+    "inventory_id": "ID Оборудования",
+    "batch_id": "ID Поставки"
 }
