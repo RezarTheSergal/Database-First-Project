@@ -7,7 +7,7 @@ class StringFilterWidget(BaseFilterWidget):
 
     def _setup_ui(self):
         """Setup UI components"""
-        self.input_widget = StringInput()
+        self.input_widget = StringInput(False)
 
         # Add the input widget to this widget's layout
         self.layout.addWidget(self.input_widget)

@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QSpinBox
+from PySide6.QtGui import QIntValidator
 from .lib.isNull import isNull
 
 class IntInput(QSpinBox):
@@ -17,6 +18,7 @@ class IntInput(QSpinBox):
     ):
         super().__init__()
         self.setMaximum(max_val or 1000000)
+
         if can_be_negative:
             self.setMinimum(min_val or -1000000)
         else:
