@@ -54,7 +54,7 @@ class AddEntryForm(Widget):
             self.inputs_container.layout.clean()
 
         columns: dict = response.data  # type: ignore
-        # pprint(columns)
+        pprint(columns)
         self._setup_form_rows(columns)
 
     def _request_entry_PUT(self):
@@ -88,20 +88,17 @@ class AddEntryForm(Widget):
         rows = []
         table = self.table_name_combo_box.get_value()
 
-        for key, data in columns.items():
-            if data.get("primary_key", False) == True:
+        for [key, data] in columns.items():
+            if data["primary_key"] == True:
                 continue
 
-            name = data.get("name", "unknown")
+            name = data["name"]
             input = InputFactory.create_filter_widget(name, data)
 
-            if isinstance(input, ComboBox):
-                input.set_items(data.get("enum_values", []))
-
             if not isinstance(input, ComboBox):
-                input.is_nullable = data.get("nullable")
-            # else:
-            #     input.set_items(get_allowed_values(table, name))
+                input.is_nullable = data["nullable"]
+            else:
+                input.set_items(get_allowed_values(table, name))
 
             if isinstance(input, (IntInput, FloatInput)):
                 input.can_be_negative = False  # FIXME: Проверять check_constraints
