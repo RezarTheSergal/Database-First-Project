@@ -1,17 +1,14 @@
 from sqlalchemy import (
     Column,
     Integer,
-    String,
     Date,
-    Float,
     Numeric,
     ARRAY,
-    Enum as SQLEnum,
+    Enum,
     ForeignKey,
     CheckConstraint,
     Text,
     TIMESTAMP,
-    BigInteger,
 )
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
