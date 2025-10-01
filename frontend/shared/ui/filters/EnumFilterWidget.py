@@ -11,7 +11,7 @@ class EnumFilterWidget(BaseFilterWidget):
         self.input_widget = ComboBox()
 
         # Добавляем пустой элемент для сброса фильтра
-        enum_values = [""] + (self.column_info.get("enum_values", []))
+        enum_values = (self.column_info.get("enum_values", []))
         self.input_widget.set_items(enum_values)
 
         return self.input_widget

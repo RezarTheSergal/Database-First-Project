@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from backend.utils.responce_types import ResponseStatus
 from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import ComboBox, Widget, PushButton, VLayout
@@ -5,6 +6,8 @@ from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.lib import translate
 from frontend.utils.MessageFactory import MessageFactory
+from frontend.shared.ui.inputs.InputFactory import InputFactory
+from frontend.shared.ui.filters.ForeignKeyFilterWidget import ForeignKeyFilterWidget
 from .lib import get_allowed_values, got_columns, get_element_by_type, is_foreign_key
 from pprint import pprint
 
@@ -81,7 +84,7 @@ class AddEntryForm(Widget):
         insert_responce = database.insert_into_table(table_name, data)
         MessageFactory.show_response_message(insert_responce, self, True)
 
-    def _setup_form_rows(self, columns: dict):
+    def _setup_form_rows(self, columns: Dict[str, Dict[str, Any]]):
         rows = []
         table = self.table_name_combo_box.get_value()
 
@@ -90,10 +93,7 @@ class AddEntryForm(Widget):
                 continue
 
             name = data["name"]
-            if is_foreign_key(data["name"]):
-                input = ComboBox()
-            else:
-                input = get_element_by_type(data["type"])
+            input = InputFactory.create_filter_widget(name, data)
 
             if not isinstance(input, ComboBox):
                 input.is_nullable = data["nullable"]
@@ -103,7 +103,10 @@ class AddEntryForm(Widget):
             if isinstance(input, (IntInput, FloatInput)):
                 input.can_be_negative = False  # FIXME: Проверять check_constraints
 
-            row = FormRow(input, key, translate(key))
+            if not data.get("foreign_keys"):
+                row = FormRow(input, key)
+            else:
+                row = input
             rows.append(row)
 
         self.inputs_container.layout.set_children(rows)

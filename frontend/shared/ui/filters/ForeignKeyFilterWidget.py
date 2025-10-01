@@ -1,6 +1,7 @@
 from typing import List, Dict, Any, Optional
 from PySide6.QtCore import QTimer, Signal
 from backend.repository import DatabaseRepository
+from frontend.shared.lib.i18n.i18n import translate
 from frontend.shared.ui.inputs import ComboBox, AutoComplete
 from backend.utils.responce_types import ResponseStatus
 from .BaseFilterWidget import BaseFilterWidget
@@ -31,8 +32,9 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
 
         # Извлекаем информацию о foreign key
         self._extract_foreign_key_info(column_info)
-
-        super().__init__(column_name, column_info, parent)
+        self.en_locale = column_name
+        self.ru_locale = translate(column_name)
+        super().__init__(self.ru_locale, column_info, parent)
 
     def _extract_foreign_key_info(self, column_info: Dict[str, Any]):
         """Извлекает информацию о foreign key из метаданных колонки"""
