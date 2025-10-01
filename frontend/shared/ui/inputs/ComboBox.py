@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QComboBox
 class ComboBox(QComboBox):
     items: Sequence[str] | None = None
 
-    def __init__(self, items: Sequence[str] = [], callback=None):
+    def __init__(self, items: Sequence[str] = [""], callback=None):
         super().__init__()
         self.clear()
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
