@@ -5,8 +5,7 @@ from .FloatInput import FloatInput
 from .IntInput import IntInput
 from .StringInput import StringInput
 from .AutoComplete import AutoComplete
-from .EnumInput import EnumInput
-from .InputFactory import InputFactory
+from .ForeignKeySearchBox import ForeignKeySearchBox
 
 __all__ = [
     "BoolInput",
@@ -16,7 +15,5 @@ __all__ = [
     "IntInput",
     "StringInput",
     "AutoComplete",
-    "EnumInput",
-    "InputFactory",
     "ForeignKeySearchBox",
 ]
