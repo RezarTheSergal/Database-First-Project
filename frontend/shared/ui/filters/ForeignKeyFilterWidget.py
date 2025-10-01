@@ -1,6 +1,7 @@
 from typing import List, Dict, Any, Optional
 from PySide6.QtCore import Signal
 from backend.repository import DatabaseRepository
+from frontend.shared.ui import Timer
 from frontend.shared.ui.inputs import ComboBox, AutoComplete
 from backend.utils.responce_types import ResponseStatus
 from .BaseFilterWidget import BaseFilterWidget

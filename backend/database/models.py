@@ -1,9 +1,7 @@
 from sqlalchemy import (
     Column,
     Integer,
-    String,
     Date,
-    Float,
     Numeric,
     ARRAY,
     Enum,
@@ -11,7 +9,6 @@ from sqlalchemy import (
     CheckConstraint,
     Text,
     TIMESTAMP,
-    BigInteger,
 )
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
