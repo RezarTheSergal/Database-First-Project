@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from PySide6.QtCore import QTimer, Signal
+from PySide6.QtCore import Signal
 from backend.repository import DatabaseRepository
 from frontend.shared.lib.i18n.i18n import translate
 from frontend.shared.ui.inputs import ComboBox, AutoComplete
@@ -17,6 +17,7 @@ INPUT_CANDIDATES = [
     "description",
 ]
 
+
 class ForeignKeyFilterWidget(BaseFilterWidget):
     """Виджет фильтра для foreign key с поиском по вводу"""
 
@@ -25,7 +26,7 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
     target_column = None
     display_column = None
     selected_id = None
-    search_timer = None
+    search_timer: Timer | None = None
     is_updating: bool = False  # Флаг для предотвращения рекурсии
 
     def __init__(self, column_name: str, column_info: Dict[str, Any], parent=None):
@@ -95,9 +96,7 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
             return
 
         # Таймер для debounce поиска
-        self.search_timer = QTimer()
-        self.search_timer.setSingleShot(True)
-        self.search_timer.timeout.connect(self._perform_search)
+        self.search_timer = Timer(is_singleshot=True, on_timeout=self._perform_search)
 
         # Соединения
         self.input_widget.editTextChanged.connect(self._on_text_changed)
@@ -106,7 +105,7 @@ class ForeignKeyFilterWidget(BaseFilterWidget):
 
     def _on_text_changed(self, text: str):
         """Обработчик изменения текста"""
-        if self.is_updating:
+        if self.is_updating or self.search_timer == None:
             return
 
         # Сбрасываем выбранный ID если текст изменился вручную

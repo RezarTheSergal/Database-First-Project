@@ -1,6 +1,12 @@
 from typing import Dict, Any
 
-from frontend.shared.ui.inputs import StringInput, DateInput, FloatInput, IntInput, BoolInput
+from frontend.shared.ui.inputs import (
+    StringInput,
+    DateInput,
+    FloatInput,
+    IntInput,
+    BoolInput,
+)
 from .BaseFilterWidget import BaseFilterWidget
 from .ForeignKeyFilterWidget import ForeignKeyFilterWidget
 from .StringFilterWidget import StringFilterWidget
@@ -38,18 +44,15 @@ class FilterWidgetFactory:
 
             elif any(t in col_type_upper for t in ("INTEGER", "BIGINT", "SERIAL")):
                 return IntegerFilterWidget(column_name, column_info)
-
             elif any(
                 t in col_type_upper for t in ("NUMERIC", "DECIMAL", "FLOAT", "REAL")
             ):
                 return FloatFilterWidget(column_name, column_info)
-
             elif "BOOLEAN" in col_type_upper:
                 return BoolInput(column_name, column_info)
 
             elif any(t in col_type_upper for t in ("DATE", "DATETIME", "TIMESTAMP")):
                 return DateFilterWidget(column_name, column_info)
-
             else:
                 # Fallback для неизвестных типов
                 return StringFilterWidget(column_name, column_info)
