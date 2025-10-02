@@ -49,5 +49,7 @@
     "caffeine_level": "Уровень кофеина",
     "sale_id": "ID Продажи",
     "inventory_id": "ID Оборудования",
-    "batch_id": "ID Поставки"
+    "batch_id": "ID Поставки",
+    "yes": "Да",
+    "no": "Нет"
 }

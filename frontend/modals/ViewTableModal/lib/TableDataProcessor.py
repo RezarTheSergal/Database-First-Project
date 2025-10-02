@@ -1,7 +1,7 @@
 from typing import Dict, List, Any, Optional, Tuple
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
-
+from frontend.shared.lib.i18n.i18n import translate
 
 class TableDataProcessor:
     """Обрабатывает бизнес-логику таблицы: метаданные, запросы к БД, преобразование типов"""
@@ -121,7 +121,7 @@ class TableDataProcessor:
 
         # Обработка булево
         if "BOOLEAN" in col_type:
-            return "Yes" if value else "No"
+            return translate("Yes") if value else translate("No")
 
         # По умолчанию
         return str(value) if value is not None else ""
