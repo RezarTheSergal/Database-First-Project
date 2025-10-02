@@ -1,6 +1,6 @@
 from typing import Sequence
 from PySide6.QtWidgets import QListWidget
-from .SizeAdjustPolicy import SizeAdjustPolicy
+from ..ui.core.SizeAdjustPolicy import SizeAdjustPolicy
 
 
 class Spinner(QListWidget):

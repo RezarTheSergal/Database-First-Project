@@ -1,4 +1,4 @@
-from frontend.shared.ui.inputs.BoolInput import BoolEditCheckBox
+from frontend.shared.ui.inputs import BoolEditCheckBox
 from .BaseFilterWidget import BaseFilterWidget
 
 

@@ -1,8 +1,7 @@
 from PySide6.QtCore import Signal
 from typing import Any, Dict
-from frontend.shared.ui import HLayout, Widget
-from frontend.shared.ui.text.Text import Text
-from frontend.shared.lib.i18n.i18n import translate
+from frontend.shared.ui import HLayout, Widget, Text
+from frontend.shared.lib import translate
 
 
 class BaseFilterWidget(Widget):

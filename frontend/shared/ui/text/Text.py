@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLabel
-from ..Alignment import Alignment
+from frontend.shared.ui import Alignment
 from .Font import Font
 
 

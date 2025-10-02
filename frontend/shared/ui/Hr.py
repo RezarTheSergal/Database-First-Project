@@ -1,6 +1,6 @@
-from ..lib.utils import setClass
+from frontend.shared.lib.utils import setClass
 from .Widget import Widget
-from .utils.Size import Size
+from .core.Size import Size
 from .Layouts import HLayout
 
 class Hr(Widget):
