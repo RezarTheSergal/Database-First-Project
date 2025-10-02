@@ -1,0 +1,5 @@
+.hidden
+.env
+.vscode
+.git
+__pycache__
