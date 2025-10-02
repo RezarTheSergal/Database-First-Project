@@ -1,4 +1,4 @@
-from .BoolInput import BoolInput
+from .BoolInput import BoolInput, BoolEditCheckBox
 from .ComboBox import ComboBox as ComboBox
 from .DateInput import DateInput
 from .FloatInput import FloatInput
@@ -16,4 +16,5 @@ __all__ = [
     "StringInput",
     "AutoComplete",
     "ForeignKeySearchBox",
+    "BoolEditCheckBox",
 ]

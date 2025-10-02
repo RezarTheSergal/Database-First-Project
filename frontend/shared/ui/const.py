@@ -1,4 +1,4 @@
-from .utils.Size import Size
+from .core.Size import Size
 from PySide6.QtWidgets import QMessageBox
 
 DEFAULT_FONT_FAMILY = "Roboto"

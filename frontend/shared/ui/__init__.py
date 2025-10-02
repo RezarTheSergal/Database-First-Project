@@ -1,20 +1,22 @@
+from .core.Alignment import Alignment
+from .core.Point import Point
+from .core.Size import Size
+
+from .text.Font import Font
+from .text.Text import Text
+from .text.H1 import H1
+
 from .PushButton import PushButton
 from .Layouts import GridLayout, VLayout, HLayout
 from .Icon import Icon
-from .Alignment import Alignment
-from .text.Font import Font
-from .text.Text import Text
 from .Gradients import LinearGradient, RadialGradient
-from .utils.Point import Point
 from .Modal import Modal
-from .utils.Size import Size
-from .text.H1 import H1
 from .Spinner import Spinner
 from .Widget import Widget
-from .SizeAdjustPolicy import SizeAdjustPolicy
+from .core.SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
 from .PromptBox import PromptBox
-from .Timer import Timer
+from .core.Timer import Timer
 
 __all__ = [
     "PushButton",
