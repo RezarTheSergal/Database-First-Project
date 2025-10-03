@@ -1,6 +1,8 @@
 from .core.Alignment import Alignment
 from .core.Point import Point
 from .core.Size import Size
+from .core.Timer import Timer
+from .core.SizeAdjustPolicy import SizeAdjustPolicy
 
 from .text.Font import Font
 from .text.Text import Text
@@ -13,10 +15,9 @@ from .Gradients import LinearGradient, RadialGradient
 from .Modal import Modal
 from .Spinner import Spinner
 from .Widget import Widget
-from .core.SizeAdjustPolicy import SizeAdjustPolicy
 from .Hr import Hr
 from .PromptBox import PromptBox
-from .core.Timer import Timer
+from .filters import FilterBlockWidget
 
 __all__ = [
     "PushButton",
@@ -39,4 +40,5 @@ __all__ = [
     "Hr",
     "PromptBox",
     "Timer",
+    "FilterBlockWidget"
 ]

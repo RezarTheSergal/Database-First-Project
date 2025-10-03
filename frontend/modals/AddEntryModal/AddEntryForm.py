@@ -3,11 +3,10 @@ from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import Widget, PushButton, VLayout
 from backend.utils.logger import logging
 from backend.repository import DatabaseResponse
-from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput,ForeignKeySearchBox
+from frontend.shared.ui.inputs import InputWidgetFactory,ComboBox, ForeignKeySearchBox
 from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
 from frontend.shared.utils.MessageFactory import MessageFactory
 from frontend.shared.lib import translate
-from .lib import get_element_by_type, is_foreign_key
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +19,12 @@ class AddEntryForm(Widget):
         super().__init__(layout=VLayout())
 
         response = DatabaseMiddleware.get_table_names()
+        if response and response.data:
+            items = response.data
+        else:
+            items = []
         self.table_name_combo_box = ComboBox(
-            items=response.data, callback=self._set_inputs_by_table  # type: ignore
+            items = items, callback = self._set_inputs_by_table
         )
         self.inputs_container = Widget(VLayout())
         self.submit_button = PushButton("Подтвердить", callback=self._request_entry_PUT)
@@ -121,19 +124,9 @@ class AddEntryForm(Widget):
             if data["primary_key"]:
                 continue
 
-            if is_foreign_key(data):
-                input = ForeignKeySearchBox(key,data)
-                self.selectors.append(input)
-            else:
-                input = get_element_by_type(data["type"])
-
-            if not isinstance(input, ComboBox) and not isinstance(input,ForeignKeySearchBox):
-                input.is_nullable = data["nullable"]
-
-            if isinstance(input, (IntInput, FloatInput)):
-                input.can_be_negative = False  # FIXME: Проверять check_constraints
-
-            row = FormRow(input, key, translate(key))
+            meta = data
+            meta["column_name"] = key
+            row = FormRow(InputWidgetFactory.create(meta), key, translate(key))
             self.rows.append(row)
 
         self.inputs_container.layout.set_children(self.rows)

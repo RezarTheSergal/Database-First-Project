@@ -6,6 +6,7 @@ from .IntInput import IntInput
 from .StringInput import StringInput
 from .utils.AutoComplete import AutoComplete
 from .ForeignKeySearchBox import ForeignKeySearchBox
+from .InputWidgetFactory import InputWidgetFactory
 
 __all__ = [
     "BoolInput",
@@ -17,4 +18,5 @@ __all__ = [
     "AutoComplete",
     "ForeignKeySearchBox",
     "BoolEditCheckBox",
+    "InputWidgetFactory"
 ]

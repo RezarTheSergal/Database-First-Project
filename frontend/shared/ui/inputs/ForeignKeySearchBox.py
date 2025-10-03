@@ -14,7 +14,7 @@ class ForeignKeySearchBox(ComboBox):
     # Add a signal for when selection changes
     selection_changed = Signal(object)
 
-    def __init__(self, column_name: str, column_info: dict, parent=None):
+    def __init__(self, column_name: str, column_info: dict, parent=None, **kwargs):
         super().__init__()
         self.setParent(parent)
         self.column_name = column_name

@@ -4,11 +4,9 @@ from PySide6.QtWidgets import QLayoutItem, QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
-from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
-from frontend.shared.ui.filters import FilterBlockWidget
+from frontend.shared.ui import PushButton, Widget, VLayout, HLayout, FilterBlockWidget
 from backend.database.models import Base
-from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
-from frontend.shared.utils.MessageFactory import MessageFactory
+from frontend.shared.utils import DatabaseMiddleware, MessageFactory
 import logging
 
 logger = logging.getLogger(__name__)

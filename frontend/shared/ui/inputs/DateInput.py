@@ -14,6 +14,7 @@ class DateInput(QDateEdit):
         year: int = 2025,
         month: int = 1,
         day: int = 1,
+        **kwargs
     ):
         super().__init__()
         self.setCalendarPopup(True)

@@ -8,8 +8,8 @@ class FloatFilterWidget(BaseFilterWidget):
     def _setup_ui(self):
         """Setup UI components"""
         # Extract min/max from column info
-        min_val = self.column_info.get("min", None)
-        max_val = self.column_info.get("max", None)
+        min_val: float = self.column_info.get("min", -10**9)
+        max_val: float = self.column_info.get("max", 10**9)
         # You might need to determine if negative values are allowed
         can_be_negative = self.column_info.get("can_be_negative", False)
 

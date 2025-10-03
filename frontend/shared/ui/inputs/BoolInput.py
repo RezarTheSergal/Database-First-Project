@@ -6,6 +6,9 @@ class BoolInput(QLineEdit):
     is_nullable: bool
     ALLOWED_VALUES: list[str] = ["true", "false"]
 
+    def __init__(self,**kwargs):
+        super().__init__()
+
     def get_value(self) -> bool:
         return bool(self.text())
 
@@ -17,7 +20,7 @@ class BoolInput(QLineEdit):
 
 class BoolEditCheckBox(QCheckBox):
 
-    def __init__(self):
+    def __init__(self,**kwargs):
         super().__init__()
 
     def get_value(self) -> bool:
