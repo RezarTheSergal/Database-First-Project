@@ -3,7 +3,6 @@ from PySide6.QtWidgets import QLineEdit
 from frontend.shared.ui.inputs import AutoComplete, ComboBox
 from frontend.shared.utils import DatabaseMiddleware
 
-
 class ForeignKeySearchBox(ComboBox):
     """Pure UI component for foreign key search - handles only UI and search logic"""
 

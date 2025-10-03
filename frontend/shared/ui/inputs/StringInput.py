@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import QLineEdit
+from .BaseInput import BaseInput
 from .lib.is_null import is_null
 
 
-class StringInput(QLineEdit):
+class StringInput(BaseInput, QLineEdit):
     is_nullable: bool
 
     def __init__(self,is_nullable:bool=False,max_input_length:int=256,**kwargs):
