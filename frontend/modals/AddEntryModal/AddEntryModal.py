@@ -4,7 +4,7 @@ from .AddEntryForm import AddEntryForm
 
 class AddEntryModal(Modal):
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         super().__init__(parent, title="Добавление данных")
 
         self.setMinimumSize(Size(600, 500))
