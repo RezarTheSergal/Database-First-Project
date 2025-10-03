@@ -18,7 +18,7 @@ database = DatabaseRepository()
 class TableControlPanel(Widget):
     """Панель управления фильтрами для таблиц с поддержкой множественных блоков"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(VLayout())
         self.blocks: List[FilterBlockWidget] = []
         self.table_names = []
@@ -27,7 +27,7 @@ class TableControlPanel(Widget):
         self._load_table_names()
         self._add_initial_filter_block()
 
-    def _setup_ui(self):
+    def _setup_ui(self) -> None:
         """Настройка пользовательского интерфейса"""
         # Заголовок
         title_layout = HLayout()

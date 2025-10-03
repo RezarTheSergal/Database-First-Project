@@ -13,6 +13,9 @@ database = DatabaseRepository()
 
 
 class AddEntryForm(Widget):
+    rows: list[FormRow] = []
+    selectors: list[ComboBox] = []
+
     def __init__(self):
         super().__init__(layout=VLayout())
 
@@ -46,14 +49,27 @@ class AddEntryForm(Widget):
             logger.error("Колонки не были получены", response.error)
             return
         else:
-            logger.info([x["type"] for x in response.data.values()])  # type: ignore
+            logger.info([x["type"] for x in response.data.values()])
             self.inputs_container.layout.clean()
 
         columns: dict = response.data  # type: ignore
-        pprint(columns)
+        # pprint(columns)
+        self._clean()
         self._setup_form_rows(columns)
 
+    def _any_selector_value_not_set(self) -> bool:
+        return any(selector.get_value() == "--не выбрано--" for selector in self.selectors)
+
     def _request_entry_PUT(self):
+        if self._any_selector_value_not_set():
+            MessageFactory._show_error(
+                DatabaseResponse(
+                    status=ResponseStatus.ERROR,
+                    message="Какой-то из селекторов не выбран!",
+                ),
+            )
+            return
+
         data = {}
 
         for child in self.inputs_container.children():
@@ -79,8 +95,11 @@ class AddEntryForm(Widget):
         insert_responce = database.insert_into_table(table_name, data)
         MessageFactory.show_response_message(insert_responce, True)
 
+    def _clean(self) -> None:
+        self.rows = []
+        self.selectors = []
+
     def _setup_form_rows(self, columns: dict):
-        rows = []
         # target_table = self.table_name_combo_box.get_value()
 
         for [key, data] in columns.items():
@@ -89,6 +108,7 @@ class AddEntryForm(Widget):
 
             if is_foreign_key(data):
                 input = ComboBox()
+                self.selectors.append(input)
             else:
                 input = get_element_by_type(data["type"])
 
@@ -99,6 +119,6 @@ class AddEntryForm(Widget):
                 input.can_be_negative = False  # FIXME: Проверять check_constraints
 
             row = FormRow(input, key, translate(key))
-            rows.append(row)
+            self.rows.append(row)
 
-        self.inputs_container.layout.set_children(rows)
+        self.inputs_container.layout.set_children(self.rows)

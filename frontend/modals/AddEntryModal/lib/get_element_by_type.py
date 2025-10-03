@@ -40,4 +40,4 @@ def get_element_by_type(type: str):
     elif isBoolType(type):
         return BoolInput()
     else:
-        return StringInput()
+        return StringInput(False)
