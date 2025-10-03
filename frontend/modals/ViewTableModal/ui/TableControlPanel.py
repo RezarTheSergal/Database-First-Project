@@ -7,10 +7,9 @@ from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
 from frontend.shared.ui.filters import FilterBlockWidget
-import logging
 from backend.database.models import Base
-
-from frontend.utils.MessageFactory import MessageFactory
+from frontend.shared.utils.MessageFactory import MessageFactory
+import logging
 
 logger = logging.getLogger(__name__)
 database = DatabaseRepository()
@@ -74,7 +73,7 @@ class TableControlPanel(Widget):
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""
         response = database.get_tablenames()
-        MessageFactory.show_response_message(response, self, True)
+        MessageFactory.show_response_message(response, True)
         if response.status == ResponseStatus.SUCCESS and response.data:
             self.table_names = response.data
             logger.info(f"Загружено {len(self.table_names)} таблиц")
@@ -84,7 +83,6 @@ class TableControlPanel(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка загрузки таблиц: {response.error}",
                 ),
-                self,
             )
             logger.error(f"Ошибка загрузки таблиц: {response.error}")
             self.table_names = []
@@ -126,7 +124,6 @@ class TableControlPanel(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка добавления блока фильтров: {e}",
                 ),
-                self,
             )
             logger.error(f"Ошибка добавления блока фильтров: {e}")
 
@@ -152,7 +149,6 @@ class TableControlPanel(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка удаления блока фильтров: {e}",
                 ),
-                self,
             )
             logger.error(f"Ошибка удаления блока фильтров: {e}")
 
@@ -160,7 +156,7 @@ class TableControlPanel(Widget):
         """Очищает все фильтры во всех блоках"""
         try:
             for block in self.blocks:
-                block.reset_filters()  # type: ignore
+                block.reset_filters()
 
             logger.info("Все фильтры очищены")
             self._apply_filters()
@@ -180,23 +176,23 @@ class TableControlPanel(Widget):
             filters = self.get_all_filters()
             table_name: str = self.blocks[0].get_selected_table()
             response_table_columns = DatabaseRepository().get_table_columns(table_name)
-            if MessageFactory.show_response_message(response_table_columns, self, True):
+            if MessageFactory.show_response_message(response_table_columns,  True):
                 logger.error(
                     f"Ошибка получения колонок: {response_table_columns.error}"
                 )
                 return
 
-            table_columns: Dict[str, Dict[str, Any]] = response_table_columns.data  # type: ignore
+            table_columns: Dict[str, Dict[str, Any]] = response_table_columns.data
 
             response_model = DatabaseRepository().get_model_by_tablename(table_name)
-            if MessageFactory.show_response_message(response_model, self, True):
+            if MessageFactory.show_response_message(response_model, True):
                 logger.error(f"Ошибка получения модели бд: {response_model.error}")
                 return
 
-            model: type[Base] = response_model.data  # type: ignore
+            model: type[Base] = response_model.data
             # print(filters, sep="\n\n")
             response_table_data = DatabaseRepository().get_table_data(
-                table_name, table_columns, filters.get(table_name, "")  # type: ignore
+                table_name, table_columns, filters.get(table_name, "")
             )
             if MessageFactory.show_response_message(response_table_data, self, True):
                 logger.error(
@@ -204,9 +200,9 @@ class TableControlPanel(Widget):
                 )
                 return
 
-            table_data: Dict[str, Any] = response_table_data.data  # type: ignore
+            table_data: Dict[str, Any] = response_table_data.data
 
-            self.table_widget.set_model(model)  # type: ignore
+            self.table_widget.set_model(model)
             self.table_widget.load_data([table_data])
             logger.info(f"Применены фильтры: {filters}")
 
@@ -216,7 +212,6 @@ class TableControlPanel(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка применения фильтров: {e}",
                 ),
-                self,
             )
             logger.error(f"Ошибка применения фильтров: {e}")
 
@@ -254,11 +249,11 @@ class TableControlPanel(Widget):
 
                         # Проверяем, содержит ли контейнер наш блок
                         for j in range(
-                            container.layout().count()  # type: ignore
+                            container.layout().count()
                             if hasattr(container, "layout")
                             else 0
                         ):
-                            child_item = container.layout().itemAt(j)  # type: ignore
+                            child_item = container.layout().itemAt(j)
                             if child_item and child_item.widget() == last_block:
                                 self._remove_filter_block(last_block, container)
                                 break
@@ -292,7 +287,6 @@ class TableControlPanel(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка установки фильтров: {e}",
                 ),
-                self,
             )
             logger.error(f"Ошибка установки фильтров: {e}")
 

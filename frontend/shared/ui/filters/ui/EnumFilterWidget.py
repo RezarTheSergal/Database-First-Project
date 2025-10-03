@@ -4,6 +4,7 @@ from .BaseFilterWidget import BaseFilterWidget
 
 class EnumFilterWidget(BaseFilterWidget):
     """Filter widget for ENUM fields using your UI component"""
+    _value: str
 
     def _setup_ui(self):
         """Setup UI components"""
@@ -14,11 +15,11 @@ class EnumFilterWidget(BaseFilterWidget):
         # Add the input widget to this widget's layout
         self.layout.addWidget(self.input_widget)
 
-    def _setup_connections(self):
+    def _setup_connections(self) -> None:
         """Setup signal connections"""
         self.input_widget.currentTextChanged.connect(self._on_text_changed)
 
-    def _on_text_changed(self, text):
+    def _on_text_changed(self, text) -> None:
         """Handle text change"""
         self._value = text
         self.value_changed.emit(text)
@@ -37,9 +38,6 @@ class EnumFilterWidget(BaseFilterWidget):
 
     def _update_ui_value(self, value: str):
         """Update UI with value"""
-        if value is not None:
-            index = self.input_widget.findText(value)
-            if index >= 0:
-                self.input_widget.setCurrentIndex(index)
-        else:
-            self.input_widget.setCurrentIndex(0)
+        index: int = self.input_widget.findText(value)
+        if index >= 0:
+            self.input_widget.setCurrentIndex(index)

@@ -1,28 +1,28 @@
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
-from frontend.shared.ui import Widget, PromptBox
+from frontend.shared.ui import PromptBox
 
 class MessageFactory:
     """Фабрика для показа сообщений пользователю"""
 
     @staticmethod
     def show_response_message(
-        response: DatabaseResponse, parent: Widget, is_modal: bool = False
+        response: DatabaseResponse, is_modal: bool = False
     ) -> bool:
         """Показывает сообщение в зависимости от статуса ответа и возвращает тип сообщения - модальное или нет"""
         if response.status == ResponseStatus.ERROR:
-            MessageFactory._show_error(response, parent)
+            MessageFactory._show_error(response)
             return True
         elif response.status == ResponseStatus.WARNING:
-            MessageFactory._show_warning(response, parent)
+            MessageFactory._show_warning(response)
             return False
         elif response.status == ResponseStatus.SUCCESS and not is_modal:
-            MessageFactory._show_success(response, parent)
+            MessageFactory._show_success(response)
             return False
         else:
             return False
 
     @staticmethod
-    def _show_error(response: DatabaseResponse, parent: Widget):
+    def _show_error(response: DatabaseResponse) -> None:
         """Показывает сообщение об ошибке"""
         error_details = ""
         if response.error_details:
@@ -30,7 +30,6 @@ class MessageFactory:
             error_details = f"\n\nДетали ошибки:\n{details_str}"
 
         msg = PromptBox()
-        msg.setParent(parent)
         msg.setIcon(PromptBox.Icon.Critical)
         msg.setWindowTitle("Ошибка")
         msg.setText(f"{response.message}")
@@ -41,20 +40,18 @@ class MessageFactory:
         msg.exec()
 
     @staticmethod
-    def _show_warning(response: DatabaseResponse, parent: Widget):
+    def _show_warning(response: DatabaseResponse):
         """Показывает предупреждение"""
         msg = PromptBox()
-        msg.setParent(parent)
         msg.setIcon(PromptBox.Icon.Warning)
         msg.setWindowTitle("Предупреждение")
         msg.setText(response.message)
         msg.exec()
 
     @staticmethod
-    def _show_success(response: DatabaseResponse, parent: Widget):
+    def _show_success(response: DatabaseResponse):
         """Показывает сообщение об успехе (только для модальных окон)"""
         msg = PromptBox()
-        msg.setParent(parent)
         msg.setIcon(PromptBox.Icon.Information)
         msg.setWindowTitle("Успех")
         msg.setText("Операция выполнена успешно!")

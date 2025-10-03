@@ -8,10 +8,10 @@ class FormRow(Widget):
     label: Text
     _layout = HLayout()
 
-    def __init__(self, input, en_label: str, ru_label: str):
+    def __init__(self, input, en_label: str, ru_label: str) -> None:
         super().__init__(HLayout())
-        self.en_label = en_label
-        self.ru_label = ru_label
+        self.en_label: str = en_label
+        self.ru_label: str = ru_label
         self.setLayout(self._layout)
 
         setClass(self, "row")

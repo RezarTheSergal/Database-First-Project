@@ -1,5 +1,7 @@
 from typing import Any, Dict, Optional
-from backend.utils.responce_types import ResponseStatus
+
+from PySide6.QtWidgets import QLayoutItem
+from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
 from backend.repository import DatabaseRepository
@@ -38,14 +40,14 @@ class FilterBlockWidget(Widget):
 
     def _on_table_changed(self, table_name: str):
         """Обновляет фильтры под выбранную таблицу"""
-        self.clear_filters()
-
         if not table_name:
             return
 
+        self.clear_filters()
+
         columns_info = self._get_columns_info(table_name)
         if not columns_info:
-            logger.warning(
+            logger.error(
                 f"Не удалось получить информацию о колонках для таблицы {table_name}"
             )
             return
@@ -53,7 +55,7 @@ class FilterBlockWidget(Widget):
         # Создаем фильтры для каждой колонки
         for col_name, col_meta in columns_info.items():
             try:
-                filter_widget = FilterWidgetFactory.create_filter_widget(
+                filter_widget: BaseFilterWidget = FilterWidgetFactory.create_filter_widget(
                     col_name, col_meta
                 )
 
@@ -66,7 +68,7 @@ class FilterBlockWidget(Widget):
 
                     # Подключаем сигналы если нужно
                     if hasattr(filter_widget, "value_changed"):
-                        filter_widget.value_changed.connect(  # type: ignore
+                        filter_widget.value_changed.connect(
                             lambda value, col=col_name: self._on_filter_value_changed(
                                 col, value
                             )
@@ -78,7 +80,7 @@ class FilterBlockWidget(Widget):
     def _get_columns_info(self, table_name: str) -> Optional[Dict[str, dict]]:
         """Получает информацию о колонках таблицы"""
         try:
-            response = database.get_table_columns(table_name)
+            response: DatabaseResponse = database.get_table_columns(table_name)
 
             if response.status == ResponseStatus.SUCCESS and response.data:
                 return response.data
@@ -103,9 +105,9 @@ class FilterBlockWidget(Widget):
     def clear_filters(self):
         """Очищает все фильтры"""
         # Удаляем все виджеты из layout
-        layout = self.filters_container.layout
+        layout: VLayout | HLayout = self.filters_container.layout
         while layout.count():
-            child = layout.takeAt(0)
+            child: QLayoutItem = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
@@ -131,10 +133,10 @@ class FilterBlockWidget(Widget):
         """Возвращает имя выбранной таблицы"""
         return self.table_combo.currentText()
 
-    def set_filter_value(self, column_name: str, value: Any, display_text: str = ""):
+    def set_filter_value(self, column_name: str, value: Any, display_text: str = "") -> None:
         """Программно устанавливает значение фильтра"""
         if column_name in self.filter_widgets:
-            filter_widget = self.filter_widgets[column_name]
+            filter_widget: BaseFilterWidget = self.filter_widgets[column_name]
 
             # Если передан display_text, обновляем метку
             if display_text:

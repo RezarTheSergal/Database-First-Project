@@ -3,8 +3,8 @@ from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import Widget, PushButton, VLayout
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
+from frontend.shared.utils.MessageFactory import MessageFactory
 from frontend.shared.lib import translate
-from frontend.utils.MessageFactory import MessageFactory
 from .lib import got_columns, get_element_by_type, is_foreign_key
 from pprint import pprint
 
@@ -34,7 +34,7 @@ class AddEntryForm(Widget):
             self.table_name_combo_box.get_value()
         )
 
-        MessageFactory.show_response_message(response, self, True)
+        MessageFactory.show_response_message(response, True)
 
         if got_columns(response):
             MessageFactory._show_error(
@@ -42,7 +42,6 @@ class AddEntryForm(Widget):
                     status=ResponseStatus.ERROR,
                     message=f"Колонки не были получены {response.error}",
                 ),
-                self,
             )
             logger.error("Колонки не были получены", response.error)
             return
@@ -59,7 +58,7 @@ class AddEntryForm(Widget):
 
         for child in self.inputs_container.children():
             if isinstance(child, FormRow):
-                label_text = child.get_label("en")
+                label_text: str = child.get_label("en")
                 input = child.input
 
                 if not isinstance(input, ComboBox) and not input.is_value_valid():
@@ -68,7 +67,6 @@ class AddEntryForm(Widget):
                             status=ResponseStatus.ERROR,
                             message=f"Предоставленное значение {label_text} инвалидно! (Внести: '{input.text()}')",
                         ),
-                        self,
                     )
                     logger.error(
                         f"Given value of {label_text} is invalid! (input: '{input.text()}')"
@@ -79,7 +77,7 @@ class AddEntryForm(Widget):
 
         table_name = self.table_name_combo_box.get_value()
         insert_responce = database.insert_into_table(table_name, data)
-        MessageFactory.show_response_message(insert_responce, self, True)
+        MessageFactory.show_response_message(insert_responce, True)
 
     def _setup_form_rows(self, columns: dict):
         rows = []
@@ -89,11 +87,10 @@ class AddEntryForm(Widget):
             if data["primary_key"]:
                 continue
 
-            [column_name,column_type] = data["name"],data["type"]
-            if is_foreign_key(column_name):
+            if is_foreign_key(data):
                 input = ComboBox()
             else:
-                input = get_element_by_type(column_type)
+                input = get_element_by_type(data["type"])
 
             if not isinstance(input, ComboBox):
                 input.is_nullable = data["nullable"]

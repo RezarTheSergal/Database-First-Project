@@ -17,7 +17,7 @@ class ForeignKeySearchBox(ComboBox):
         self.id_column = id_column
 
         self.setLineEdit(QLineEdit())
-        self.lineEdit().setPlaceholderText("Поиск...")  # type: ignore
+        self.lineEdit().setPlaceholderText("Поиск...")
 
         self.setEditable(True)
         self.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)

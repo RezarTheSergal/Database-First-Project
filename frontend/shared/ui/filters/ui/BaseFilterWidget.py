@@ -59,7 +59,7 @@ class BaseFilterWidget(Widget):
         self._value = value
         self._update_ui_value(value)
 
-    def is_empty(self) -> bool: # type: ignore
+    def is_empty(self) -> bool:
         pass
 
     def clear_value(self):

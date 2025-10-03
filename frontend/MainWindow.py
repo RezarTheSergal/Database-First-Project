@@ -1,5 +1,5 @@
 from frontend.modals import AddEntryModal, ViewTableModal
-from frontend.utils.DBSetup import init_database_callback
+from frontend.shared.utils.DBSetup import init_database_callback
 from frontend.shared.ui import (
     PushButton,
     VLayout,
