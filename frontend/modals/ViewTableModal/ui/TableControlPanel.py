@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import List, Dict, Any
-from PySide6.QtWidgets import QScrollArea, QWidget
+from PySide6.QtWidgets import QLayoutItem, QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
@@ -166,7 +166,6 @@ class TableControlPanel(Widget):
                 DatabaseResponse(
                     status=ResponseStatus.ERROR, message=f"Ошибка очистки фильтров: {e}"
                 ),
-                self,
             )
             logger.error(f"Ошибка очистки фильтров: {e}")
 
@@ -194,7 +193,7 @@ class TableControlPanel(Widget):
             response_table_data = DatabaseRepository().get_table_data(
                 table_name, table_columns, filters.get(table_name, "")
             )
-            if MessageFactory.show_response_message(response_table_data, self, True):
+            if MessageFactory.show_response_message(response_table_data, True):
                 logger.error(
                     f"Ошибка получения данных таблицы: {response_table_data.error}"
                 )
@@ -240,12 +239,12 @@ class TableControlPanel(Widget):
         try:
             # Очищаем текущие блоки (кроме первого)
             while len(self.blocks) > 1:
-                last_block = self.blocks[-1]
+                last_block: FilterBlockWidget = self.blocks[-1]
                 # Найдем контейнер для этого блока и удалим
                 for i in range(self.blocks_container.layout.count()):
-                    item = self.blocks_container.layout.itemAt(i)
+                    item: QLayoutItem = self.blocks_container.layout.itemAt(i)
                     if item and item.widget():
-                        container = item.widget()
+                        container: QWidget = item.widget()
 
                         # Проверяем, содержит ли контейнер наш блок
                         for j in range(

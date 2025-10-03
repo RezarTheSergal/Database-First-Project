@@ -7,5 +7,5 @@ from frontend.shared.ui import Widget
 def init_database_callback(parent: Widget) -> DatabaseResponse:
     # drpepperus666 ответ нужно проверить на наличие ошибок при выполнении запроса к API
     response = init_database()
-    MessageFactory.show_response_message(response, parent)
+    MessageFactory.show_response_message(response)
     return response
