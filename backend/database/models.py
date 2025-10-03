@@ -46,7 +46,6 @@ class ProductionBatches(Base):
         ForeignKey('products.product_id'), 
         nullable=False
     )
-    equipment_id = Column(Integer, nullable=False)
     production_date = Column(Date, nullable=False)
     quantity_produced = Column(Integer, nullable=False)
     
@@ -58,7 +57,7 @@ class ProductionBatches(Base):
     # Связи
     product = relationship("Products", back_populates="production_batches")
 
-# Таблица инвентаря
+# Таблица складских запасов
 class Inventory(Base):
     __tablename__ = 'inventory'
     
