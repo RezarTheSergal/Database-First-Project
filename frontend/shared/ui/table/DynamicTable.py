@@ -1,13 +1,15 @@
 from typing import List, Dict, Any, Optional
+from sqlalchemy.orm import DeclarativeBase
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
-from ..lib.TableDataProcessor import TableDataProcessor
+from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import SizeAdjustPolicy
-from ..lib.set_model import set_model
-
+from frontend.shared.utils import DatabaseMiddleware
+from .TableDataProcessor import TableDataProcessor
+from .convert_to_ui_value import convert_to_ui_value
 
 class DynamicTable(QTableWidget):
     """Таблица с управляющей логикой для отображения данных"""
-
+    _data_processor: TableDataProcessor
     def __init__(self, model_class: Optional[type] = None):
         super().__init__()
         self.setSizeAdjustPolicy(SizeAdjustPolicy.AdjustToContents)
@@ -18,7 +20,7 @@ class DynamicTable(QTableWidget):
 
         # Если модель указана, устанавливаем модель
         if model_class:
-            set_model(self, model_class)
+            self.set_model(model_class)
 
         # Настройка колонок
         self._setup_columns()
@@ -29,8 +31,9 @@ class DynamicTable(QTableWidget):
         self.setColumnCount(len(columns))
         self.setHorizontalHeaderLabels(columns)
 
-    def load_data(self, data: List[Dict[str, Any]]) -> None:
+    def set_data(self, data: List[Dict[str, Any]]) -> None:
         """Загружает данные в таблицу"""
+        self.clear()
         self.setRowCount(len(data))
         columns = self._data_processor.get_columns()
 
@@ -45,7 +48,7 @@ class DynamicTable(QTableWidget):
 
     def _create_item_for_value(self, col_name: str, value: Any) -> QTableWidgetItem:
         """Создает ячейку с правильным отображением значения"""
-        display_text = self._data_processor.convert_to_ui_value(col_name, value)
+        display_text = convert_to_ui_value(value,col_name)
         return QTableWidgetItem(display_text)
 
     def add_empty_row(self) -> None:
@@ -91,3 +94,19 @@ class DynamicTable(QTableWidget):
             value = data_dict.get(col_name)
             item = self._create_item_for_value(col_name, value)
             self.setItem(row, col_idx, item)
+
+    def set_model(self, model_class: type[DeclarativeBase]):
+        """Устанавливает модель SQLAlchemy и настраивает колонки"""
+        self._model_class = model_class
+        table_name = model_class.__tablename__
+
+        # Получаем метаданные колонок
+        col_resp = DatabaseMiddleware.get_columns_by_table_name(table_name)
+        if not col_resp or not col_resp.data or col_resp.status != ResponseStatus.SUCCESS:
+            raise ValueError(
+                f"Не удалось загрузить колонки для {table_name}: {col_resp}"
+            )
+
+        self._column_info = col_resp.data
+        self._setup_columns()
+        self._data_processor.preload_foreign_key_data(self._column_info.col_name)

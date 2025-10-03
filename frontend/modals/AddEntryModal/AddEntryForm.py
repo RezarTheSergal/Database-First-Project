@@ -41,7 +41,7 @@ class AddEntryForm(Widget):
             self.table_name_combo_box.get_value()
         )
 
-        MessageFactory.show(response, True)
+        MessageFactory.show(response)
 
         if not response:
             MessageFactory.show(
@@ -111,7 +111,7 @@ class AddEntryForm(Widget):
 
         table_name: str = self.table_name_combo_box.get_value()
         insert_responce = DatabaseMiddleware.put_data(table_name, data)
-        MessageFactory.show(insert_responce, True)
+        MessageFactory.show(insert_responce)
 
     def _clean(self) -> None:
         self.rows = []

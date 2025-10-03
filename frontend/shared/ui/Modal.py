@@ -2,16 +2,16 @@ from .core.Size import Size
 from .Icon import Icon
 from .Layouts import VLayout
 from .Widget import Widget
-from .const import DEFAULT_MAX_SIZE
 from backend.settings import ICON_PATH
 from frontend.shared.lib.utils import setClass
 
+FULL_HD:Size = Size(1920,1080)
 
 class Modal(Widget):
     def __init__(
         self,
         parent,
-        max_size: Size = DEFAULT_MAX_SIZE,
+        max_size: Size = FULL_HD,
         title="NO_TITLE",
         accessible_name="",
     ):

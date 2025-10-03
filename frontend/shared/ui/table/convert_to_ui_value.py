@@ -2,7 +2,12 @@ from typing import Any
 from frontend.shared.lib import translate
 
 
-def convert_to_ui_value(column_meta: dict[str,Any],foreign_key_meta:dict[str,Any], col_name: str, value: Any) -> str:
+def convert_to_ui_value(
+    value: Any,
+    col_name: str,
+    column_meta: dict[str, Any] = {},
+    foreign_key_meta: dict[str, Any] = {},
+) -> str:
     """Преобразует значение в строку для отображения в таблице"""
     if value is None:
         return ""
