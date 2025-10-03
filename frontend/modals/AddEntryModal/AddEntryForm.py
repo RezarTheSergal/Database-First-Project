@@ -6,7 +6,6 @@ from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.utils.MessageFactory import MessageFactory
 from frontend.shared.lib import translate
 from .lib import got_columns, get_element_by_type, is_foreign_key
-from pprint import pprint
 
 logger = logging.getLogger(__name__)
 database = DatabaseRepository()
@@ -37,32 +36,39 @@ class AddEntryForm(Widget):
             self.table_name_combo_box.get_value()
         )
 
-        MessageFactory.show_response_message(response, True)
+        MessageFactory.show(response, True)
 
         if got_columns(response):
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Колонки не были получены {response.error}",
                 ),
             )
             logger.error("Колонки не были получены", response.error)
-            return
+        elif response.data is None:
+            MessageFactory.show(
+                DatabaseResponse(
+                    status=ResponseStatus.ERROR,
+                    message=f"Нет данных {response.error}",
+                ),
+            )
+            logger.error("Нет данных", response.error)
         else:
             logger.info([x["type"] for x in response.data.values()])
             self.inputs_container.layout.clean()
 
-        columns: dict = response.data  # type: ignore
-        # pprint(columns)
-        self._clean()
-        self._setup_form_rows(columns)
+            columns: dict = response.data  # type: ignore
+            # pprint(columns)
+            self._clean()
+            self._setup_form_rows(columns)
 
     def _any_selector_value_not_set(self) -> bool:
         return any(selector.get_value() == "--не выбрано--" for selector in self.selectors)
 
     def _request_entry_PUT(self):
         if self._any_selector_value_not_set():
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message="Какой-то из селекторов не выбран!",
@@ -78,7 +84,7 @@ class AddEntryForm(Widget):
                 input = child.input
 
                 if not isinstance(input, ComboBox) and not input.is_value_valid():
-                    MessageFactory._show_error(
+                    MessageFactory.show(
                         DatabaseResponse(
                             status=ResponseStatus.ERROR,
                             message=f"Предоставленное значение {label_text} инвалидно! (Внести: '{input.text()}')",
@@ -93,13 +99,13 @@ class AddEntryForm(Widget):
 
         table_name = self.table_name_combo_box.get_value()
         insert_responce = database.insert_into_table(table_name, data)
-        MessageFactory.show_response_message(insert_responce, True)
+        MessageFactory.show(insert_responce, True)
 
     def _clean(self) -> None:
         self.rows = []
         self.selectors = []
 
-    def _setup_form_rows(self, columns: dict):
+    def _setup_form_rows(self, columns: dict) -> None:
         # target_table = self.table_name_combo_box.get_value()
 
         for [key, data] in columns.items():

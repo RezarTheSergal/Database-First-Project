@@ -1,9 +1,7 @@
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget, QLayout
+from typing import Any
 
-Children = list[QWidget]
-
-
-def add_children(layout: QLayout, children: Children):
+def add_children(layout: QLayout, children: list[Any]):
     for child in children:
         layout.addWidget(child)
 
@@ -30,7 +28,7 @@ def clean(layout: QLayout):
 class VLayout(QVBoxLayout):
 
     def __init__(
-        self, children: Children | None = None, gap_px: int = 10, alignment=None
+        self, children: list[Any] | None = None, gap_px: int = 10, alignment=None
     ):
         super().__init__()
 
@@ -40,11 +38,11 @@ class VLayout(QVBoxLayout):
         if children:
             self.add_children(children)
 
-    def set_children(self, children: Children):
+    def set_children(self, children: list[Any]):
         self.clean()
         self.add_children(children)
 
-    def add_children(self, children: Children):
+    def add_children(self, children: list[Any]):
         add_children(self, children)
 
     def clean(self):
@@ -54,7 +52,7 @@ class VLayout(QVBoxLayout):
 class HLayout(QHBoxLayout):
 
     def __init__(
-        self, children: Children | None = None, gap_px: int = 10, alignment=None
+        self, children: list[Any] | None = None, gap_px: int = 10, alignment=None
     ):
         super().__init__()
 
@@ -64,11 +62,11 @@ class HLayout(QHBoxLayout):
         if children:
             self.add_children(children)
 
-    def set_children(self, children: Children):
+    def set_children(self, children: list[Any]):
         self.clean()
         self.add_children(children)
 
-    def add_children(self, children: Children):
+    def add_children(self, children: list[Any]):
         add_children(self, children)
 
     def clean(self):
@@ -78,7 +76,7 @@ class HLayout(QHBoxLayout):
 class GridLayout(QGridLayout):
 
     def __init__(
-        self, children: Children | None = None, gap_px: int = 10, alignment=None
+        self, children: list[QWidget] | None = None, gap_px: int = 10, alignment=None
     ):
         super().__init__()
 
@@ -88,11 +86,11 @@ class GridLayout(QGridLayout):
         if children:
             self.add_children(children)
 
-    def set_children(self, children: Children):
+    def set_children(self, children: list[Any]):
         self.clean()
         self.add_children(children)
 
-    def add_children(self, children: Children):
+    def add_children(self, children: list[Any]):
         add_children(self, children)
 
     def clean(self):

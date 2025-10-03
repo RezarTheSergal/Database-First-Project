@@ -73,12 +73,12 @@ class TableControlPanel(Widget):
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""
         response = database.get_tablenames()
-        MessageFactory.show_response_message(response, True)
+        MessageFactory.show(response, True)
         if response.status == ResponseStatus.SUCCESS and response.data:
             self.table_names = response.data
             logger.info(f"Загружено {len(self.table_names)} таблиц")
         else:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка загрузки таблиц: {response.error}",
@@ -119,7 +119,7 @@ class TableControlPanel(Widget):
             logger.info(f"Добавлен блок фильтров #{len(self.blocks)}")
 
         except Exception as e:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка добавления блока фильтров: {e}",
@@ -144,7 +144,7 @@ class TableControlPanel(Widget):
             self._apply_filters()
 
         except Exception as e:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка удаления блока фильтров: {e}",
@@ -162,7 +162,7 @@ class TableControlPanel(Widget):
             self._apply_filters()
 
         except Exception as e:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR, message=f"Ошибка очистки фильтров: {e}"
                 ),
@@ -175,7 +175,7 @@ class TableControlPanel(Widget):
             filters = self.get_all_filters()
             table_name: str = self.blocks[0].get_selected_table()
             response_table_columns = DatabaseRepository().get_table_columns(table_name)
-            if MessageFactory.show_response_message(response_table_columns,  True):
+            if MessageFactory.show(response_table_columns,  True):
                 logger.error(
                     f"Ошибка получения колонок: {response_table_columns.error}"
                 )
@@ -184,7 +184,7 @@ class TableControlPanel(Widget):
             table_columns: Dict[str, Dict[str, Any]] = response_table_columns.data
 
             response_model = DatabaseRepository().get_model_by_tablename(table_name)
-            if MessageFactory.show_response_message(response_model, True):
+            if MessageFactory.show(response_model, True):
                 logger.error(f"Ошибка получения модели бд: {response_model.error}")
                 return
 
@@ -193,7 +193,7 @@ class TableControlPanel(Widget):
             response_table_data = DatabaseRepository().get_table_data(
                 table_name, table_columns, filters.get(table_name, "")
             )
-            if MessageFactory.show_response_message(response_table_data, True):
+            if MessageFactory.show(response_table_data, True):
                 logger.error(
                     f"Ошибка получения данных таблицы: {response_table_data.error}"
                 )
@@ -206,7 +206,7 @@ class TableControlPanel(Widget):
             logger.info(f"Применены фильтры: {filters}")
 
         except Exception as e:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка применения фильтров: {e}",
@@ -281,7 +281,7 @@ class TableControlPanel(Widget):
             logger.info(f"Установлены фильтры: {filters_dict}")
 
         except Exception as e:
-            MessageFactory._show_error(
+            MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
                     message=f"Ошибка установки фильтров: {e}",

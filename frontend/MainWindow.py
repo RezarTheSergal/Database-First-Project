@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         # Rezar: перенёс логику проверки на существование БД в бэк инициализации
         create_scheme_btn = PushButton(
             "создать схему и таблицы",
-            callback=lambda: init_database_callback(self.widget),
+            callback=lambda: init_database_callback(),
         )
         add_entry_btn = PushButton(
             "внести данные",

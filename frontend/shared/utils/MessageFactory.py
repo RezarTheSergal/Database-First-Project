@@ -7,7 +7,7 @@ class MessageFactory:
     """Фабрика для показа сообщений пользователю"""
 
     @staticmethod
-    def show_response_message(
+    def show(
         response: DatabaseResponse, is_modal: bool = False
     ) -> bool:
         """Показывает сообщение в зависимости от статуса ответа и возвращает тип сообщения - модальное или нет"""
