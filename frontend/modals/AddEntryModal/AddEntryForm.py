@@ -2,6 +2,7 @@ from backend.utils.responce_types import ResponseStatus
 from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import Widget, PushButton, VLayout
 from backend.repository import DatabaseRepository, logging, DatabaseResponse
+from frontend.shared.ui.inputs.ForeignKeySearchBox import ForeignKeySearchBox
 from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
 from frontend.shared.utils.MessageFactory import MessageFactory
 from frontend.shared.lib import translate
@@ -13,7 +14,7 @@ database = DatabaseRepository()
 
 class AddEntryForm(Widget):
     rows: list[FormRow] = []
-    selectors: list[ComboBox] = []
+    selectors: list[ComboBox | ForeignKeySearchBox] = []
 
     def __init__(self):
         super().__init__(layout=VLayout())
@@ -113,12 +114,12 @@ class AddEntryForm(Widget):
                 continue
 
             if is_foreign_key(data):
-                input = ComboBox()
+                input = ForeignKeySearchBox(key,data)
                 self.selectors.append(input)
             else:
                 input = get_element_by_type(data["type"])
 
-            if not isinstance(input, ComboBox):
+            if not isinstance(input, ComboBox) and not isinstance(input,ForeignKeySearchBox):
                 input.is_nullable = data["nullable"]
 
             if isinstance(input, (IntInput, FloatInput)):
