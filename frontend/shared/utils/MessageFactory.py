@@ -1,5 +1,7 @@
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.shared.ui import PromptBox
+from PySide6.QtWidgets import QMessageBox
+
 
 class MessageFactory:
     """Фабрика для показа сообщений пользователю"""
@@ -33,6 +35,8 @@ class MessageFactory:
         msg.setIcon(PromptBox.Icon.Critical)
         msg.setWindowTitle("Ошибка")
         msg.setText(f"{response.message}")
+        msg.setStandardButtons(QMessageBox.StandardButton.Yes)
+        msg.button(QMessageBox.StandardButton.Yes).setText("Круто!🔥🔥🔥")
         if response.error_code:
             msg.setInformativeText(f"Код ошибки: {response.error_code.value}{error_details}")
         else:
