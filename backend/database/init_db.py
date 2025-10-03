@@ -140,11 +140,17 @@ def create_tables() -> DatabaseResponse:
     db_tables = set(inspector.get_table_names(schema='public'))
     tables_to_create = metadata_tables - db_tables
     
-    if tables_to_create:
-        Base.metadata.create_all(bind=db_engine)
-        logger.info(f"Созданы таблицы: {', '.join(sorted(tables_to_create))}")
-    else:
-        logger.info("Все таблицы уже существуют!")
+
+    """Создает все таблицы в базе данных"""
+    # ПЕРЕСОЗДАЕМ ВСЕ ТАБЛИЦЫ (удаляем старые)
+    Base.metadata.drop_all(bind=db_engine)
+    logger.info("Существующие таблицы удалены")
+    
+    # Создаем все таблицы заново
+    Base.metadata.create_all(bind=db_engine)
+    logger.info("Все таблицы созданы заново")
+    
+    # ... остальной код без изменений ...
     
     # Логируем список таблиц (без conn, используем inspector)
     tables = inspector.get_table_names(schema='public')
