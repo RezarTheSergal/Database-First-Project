@@ -1,4 +1,4 @@
-from .ui.TableControlPanel import TableControlPanel
+from .TableControlPanel import TableControlPanel
 from frontend.shared.ui import Modal, Size
 
 

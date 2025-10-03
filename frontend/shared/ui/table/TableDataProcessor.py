@@ -4,11 +4,12 @@ from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
 
 class TableDataProcessor:
     """Обрабатывает бизнес-логику таблицы: метаданные, запросы к БД, преобразование типов"""
+    _column_meta: Dict[str, Any] = {}
+    _foreign_key_data: Dict[str, List[Tuple[Any, str]]] = {}
+    _enum_values: Dict[str, List[Any]] = {}
+    _model_class: Optional[type]
 
     def __init__(self, model_class: Optional[type]) -> None:
-        self._column_meta: Dict[str, Any] = {}
-        self._foreign_key_data: Dict[str, List[Tuple[Any, str]]] = {}
-        self._enum_values: Dict[str, List[Any]] = {}
         self._model_class = model_class
         self._load_metadata()
 
@@ -40,8 +41,8 @@ class TableDataProcessor:
         ):
             return "id"
 
-        cols = col_resp.data
-        candidates = ["name", "title", "label", "model", "type", "flavor"]
+        cols: dict[str,Any] = col_resp.data
+        candidates: List[str] = ["name", "title", "label", "model", "type", "flavor"]
         for candidate in candidates:
             if candidate in cols:
                 col_type = (cols[candidate].get("type") or "").upper()
@@ -54,7 +55,7 @@ class TableDataProcessor:
                     return name
         return list(cols.keys())[0] if cols else "id"
 
-    def _preload_foreign_key_data(self, col_name: str) -> None:
+    def preload_foreign_key_data(self, col_name: str) -> None:
         """Предзагружает данные для внешних ключей"""
         if col_name not in self._foreign_key_data:
             return
@@ -83,7 +84,6 @@ class TableDataProcessor:
     def get_column_meta(self, col_name: str) -> Optional[Dict]:
         """Возвращает метаданные колонки"""
         return self._column_meta.get(col_name)
-
 
     def convert_from_ui_value(self, col_name: str, display_text: str) -> Any:
         """Преобразует строку из UI в бизнес-формат"""
@@ -120,7 +120,3 @@ class TableDataProcessor:
 
         # По умолчанию
         return display_text if display_text else None
-
-    def preload_foreign_key_data(self, col_name: str) -> None:
-        """Предзагружает данные для внешнего ключа (вызывается при необходимости)"""
-        self._preload_foreign_key_data(col_name)

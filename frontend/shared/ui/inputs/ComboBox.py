@@ -1,8 +1,9 @@
 from typing import Sequence
 from PySide6.QtWidgets import QComboBox
+from .BaseInput import BaseInput
 
 
-class ComboBox(QComboBox):
+class ComboBox(BaseInput, QComboBox):
     items: Sequence[str] | None = None
 
     def __init__(self, items: Sequence[str] = [""], callback=None,**kwargs):

@@ -3,7 +3,8 @@ from typing import List, Dict, Any
 from PySide6.QtWidgets import QLayoutItem, QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
-from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
+from frontend.shared.ui.table.DynamicTable import DynamicTable
+from frontend.shared.ui.inputs import ComboBox
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout, FilterBlockWidget
 from backend.database.models import Base
 from frontend.shared.utils import DatabaseMiddleware, MessageFactory
@@ -15,10 +16,11 @@ logger = logging.getLogger(__name__)
 class TableControlPanel(Widget):
     """Панель управления фильтрами для таблиц с поддержкой множественных блоков"""
 
+    blocks: List[FilterBlockWidget] = []
+    table_names: list[str] = []
+
     def __init__(self) -> None:
         super().__init__(VLayout())
-        self.blocks: List[FilterBlockWidget] = []
-        self.table_names = []
 
         self._setup_ui()
         self._load_table_names()
@@ -26,10 +28,13 @@ class TableControlPanel(Widget):
 
     def _setup_ui(self) -> None:
         """Настройка пользовательского интерфейса"""
-        # Заголовок
-        title_layout = HLayout()
-
         # Кнопки управления
+        self.base_table_selector = ComboBox(
+            DatabaseMiddleware.get_table_names().data or ["ERROR"], self._load_table
+        )
+        self.load_table_button = PushButton(
+            text="Загрузить таблицу целиком", callback=self._load_table
+        )
         self.add_button = PushButton(
             text="+ Добавить фильтр", callback=self._add_filter_block
         )
@@ -40,11 +45,17 @@ class TableControlPanel(Widget):
             text="o Применить фильтры", callback=self._apply_filters
         )
 
-        title_layout.addWidget(self.add_button)
-        title_layout.addWidget(self.clear_button)
-        title_layout.addWidget(self.apply_button)
+        title_layout = HLayout()
         title_layout.addStretch()
-
+        title_layout.add_children(
+            [
+                self.base_table_selector,
+                self.load_table_button,
+                self.add_button,
+                self.apply_button,
+                self.clear_button,
+            ]
+        )
         self.layout.addLayout(title_layout)
 
         # Контейнер со скроллом для блоков фильтров
@@ -67,10 +78,36 @@ class TableControlPanel(Widget):
         )
         self.layout.addWidget(self.table_widget)
 
+    def _load_table(self) -> None:
+        """Загружает все данные из таблицы"""
+        table_name: str = self.base_table_selector.get_value()
+        response = DatabaseMiddleware.get_all(table_name)
+
+        if (
+            response is None
+            or response.data is None
+            or response.status == ResponseStatus.ERROR
+        ):
+            logger.error(f"Не смог загрузить данные таблицы: {response}")
+            MessageFactory.show(response)
+            return
+
+        data = response.data
+        if data == []:
+
+            MessageFactory.show(
+                DatabaseResponse(
+                    status=ResponseStatus.WARNING,
+                    message="Таблица найдена, но она пуста.",
+                )
+            )
+        else:
+            self.table_widget.set_data(data)
+
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""
         response = DatabaseMiddleware.get_table_names()
-        MessageFactory.show(response, True)
+        MessageFactory.show(response)
         if response and response.status == ResponseStatus.SUCCESS and response.data:
             self.table_names = response.data
             logger.info(f"Загружено {len(self.table_names)} таблиц")
@@ -181,8 +218,10 @@ class TableControlPanel(Widget):
 
             model: type[Base] = model_response.data
             table_data_response = DatabaseMiddleware.get_where(table_name, filters)
-            if not table_data_response or table_data_response.data is None or MessageFactory.show(
-                table_data_response, True
+            if (
+                not table_data_response
+                or table_data_response.data is None
+                or MessageFactory.show(table_data_response)
             ):
                 logger.error(
                     f"Ошибка получения данных таблицы: {table_data_response.error}"

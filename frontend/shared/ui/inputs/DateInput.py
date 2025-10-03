@@ -2,9 +2,9 @@ from PySide6.QtWidgets import QDateEdit
 from .utils.DateTime import DateTime
 from .utils.Date import Date
 from .utils.Time import Time
+from .BaseInput import BaseInput
 
-
-class DateInput(QDateEdit):
+class DateInput(BaseInput, QDateEdit):
     is_nullable: bool
     display_format: str
 

@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QLineEdit, QCheckBox
 from .lib.is_null import is_null
+from .BaseInput import BaseInput
 
-
-class BoolInput(QLineEdit):
+class BoolInput(BaseInput,QLineEdit):
     is_nullable: bool
     ALLOWED_VALUES: list[str] = ["true", "false"]
 
@@ -18,10 +18,12 @@ class BoolInput(QLineEdit):
         return True
 
 
-class BoolEditCheckBox(QCheckBox):
-
+class BoolEditCheckBox(BaseInput,QCheckBox):
     def __init__(self,**kwargs):
         super().__init__()
 
     def get_value(self) -> bool:
         return bool(self.isChecked())
+
+    def is_value_valid(self) -> bool:
+        return True
