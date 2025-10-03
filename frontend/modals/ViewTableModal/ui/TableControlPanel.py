@@ -2,17 +2,16 @@ from collections import defaultdict
 from typing import List, Dict, Any
 from PySide6.QtWidgets import QLayoutItem, QScrollArea, QWidget
 from PySide6.QtCore import Qt
-from backend.repository import DatabaseRepository
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.modals.ViewTableModal.ui.DynamicTable import DynamicTable
 from frontend.shared.ui import PushButton, Widget, VLayout, HLayout
 from frontend.shared.ui.filters import FilterBlockWidget
 from backend.database.models import Base
+from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
 from frontend.shared.utils.MessageFactory import MessageFactory
 import logging
 
 logger = logging.getLogger(__name__)
-database = DatabaseRepository()
 
 
 class TableControlPanel(Widget):
@@ -72,19 +71,19 @@ class TableControlPanel(Widget):
 
     def _load_table_names(self):
         """Загружает список имен таблиц из БД"""
-        response = database.get_tablenames()
+        response = DatabaseMiddleware.get_table_names()
         MessageFactory.show(response, True)
-        if response.status == ResponseStatus.SUCCESS and response.data:
+        if response and response.status == ResponseStatus.SUCCESS and response.data:
             self.table_names = response.data
             logger.info(f"Загружено {len(self.table_names)} таблиц")
         else:
             MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
-                    message=f"Ошибка загрузки таблиц: {response.error}",
+                    message=f"Ошибка загрузки таблиц: {response.error}",  # type: ignore
                 ),
             )
-            logger.error(f"Ошибка загрузки таблиц: {response.error}")
+            logger.error(f"Ошибка загрузки таблиц: {response.error}")  # type: ignore
             self.table_names = []
 
     def _add_initial_filter_block(self):
@@ -169,40 +168,33 @@ class TableControlPanel(Widget):
             )
             logger.error(f"Ошибка очистки фильтров: {e}")
 
+    def get_selected_table(self) -> str:
+        return self.blocks[0].get_selected_table()
+
     def _apply_filters(self):
         """Применяет текущие фильтры и отправляет сигнал"""
         try:
-            filters = self.get_all_filters()
-            table_name: str = self.blocks[0].get_selected_table()
-            response_table_columns = DatabaseRepository().get_table_columns(table_name)
-            if MessageFactory.show(response_table_columns,  True):
+            filters: Dict[str, Dict[str, Any]] = self.get_all_filters()
+            table_name: str = self.get_selected_table()
+
+            model_response = DatabaseMiddleware().get_table_schema(table_name)
+            if not model_response or model_response.data is None:
+                return
+
+            model: type[Base] = model_response.data
+            table_data_response = DatabaseMiddleware.get_where(table_name, filters)
+            if not table_data_response or table_data_response.data is None or MessageFactory.show(
+                table_data_response, True
+            ):
                 logger.error(
-                    f"Ошибка получения колонок: {response_table_columns.error}"
+                    f"Ошибка получения данных таблицы: {table_data_response.error}"
                 )
                 return
 
-            table_columns: Dict[str, Dict[str, Any]] = response_table_columns.data
-
-            response_model = DatabaseRepository().get_model_by_tablename(table_name)
-            if MessageFactory.show(response_model, True):
-                logger.error(f"Ошибка получения модели бд: {response_model.error}")
-                return
-
-            model: type[Base] = response_model.data
-            # print(filters, sep="\n\n")
-            response_table_data = DatabaseRepository().get_table_data(
-                table_name, table_columns, filters.get(table_name, "")
-            )
-            if MessageFactory.show(response_table_data, True):
-                logger.error(
-                    f"Ошибка получения данных таблицы: {response_table_data.error}"
-                )
-                return
-
-            table_data: Dict[str, Any] = response_table_data.data
+            data = table_data_response.data
 
             self.table_widget.set_model(model)
-            self.table_widget.load_data([table_data])
+            self.table_widget.load_data([data])
             logger.info(f"Применены фильтры: {filters}")
 
         except Exception as e:

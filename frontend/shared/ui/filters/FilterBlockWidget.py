@@ -1,17 +1,16 @@
 from typing import Any, Dict, Optional
 
 from PySide6.QtWidgets import QLayoutItem
-from backend.utils.responce_types import DatabaseResponse, ResponseStatus
+from backend.utils.responce_types import ResponseStatus
 from frontend.shared.ui import VLayout, Widget, HLayout
 from frontend.shared.ui.inputs.ComboBox import ComboBox
-from backend.repository import DatabaseRepository
+from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
 from .ui.FilterWidgetFactory import FilterWidgetFactory
 from .ui.BaseFilterWidget import BaseFilterWidget
 from .lib.set_filter_value import set_filter_value
 import logging
 
 logger = logging.getLogger()
-database = DatabaseRepository()
 
 
 class FilterBlockWidget(Widget):
@@ -80,15 +79,14 @@ class FilterBlockWidget(Widget):
     def _get_columns_info(self, table_name: str) -> Optional[Dict[str, dict]]:
         """Получает информацию о колонках таблицы"""
         try:
-            response: DatabaseResponse = database.get_table_columns(table_name)
+            response = DatabaseMiddleware.get_columns_by_table_name(table_name)
 
-            if response.status == ResponseStatus.SUCCESS and response.data:
+            if response and response.data and response.status == ResponseStatus.SUCCESS:
                 return response.data
             else:
                 logger.error(
-                    f"Ошибка получения колонок для таблицы {table_name}: {response.error}"
+                    f"Ошибка получения колонок для таблицы {table_name}: {response.error}" # type: ignore
                 )
-                return None
 
         except Exception as e:
             logger.error(

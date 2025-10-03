@@ -1,15 +1,15 @@
 from backend.utils.responce_types import ResponseStatus
 from frontend.modals.AddEntryModal.FormRow import FormRow
 from frontend.shared.ui import Widget, PushButton, VLayout
-from backend.repository import DatabaseRepository, logging, DatabaseResponse
-from frontend.shared.ui.inputs.ForeignKeySearchBox import ForeignKeySearchBox
-from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput
+from backend.utils.logger import logging
+from backend.repository import DatabaseResponse
+from frontend.shared.ui.inputs import ComboBox, IntInput, FloatInput,ForeignKeySearchBox
+from frontend.shared.utils.DatabaseMiddleware import DatabaseMiddleware
 from frontend.shared.utils.MessageFactory import MessageFactory
 from frontend.shared.lib import translate
-from .lib import got_columns, get_element_by_type, is_foreign_key
+from .lib import get_element_by_type, is_foreign_key
 
 logger = logging.getLogger(__name__)
-database = DatabaseRepository()
 
 
 class AddEntryForm(Widget):
@@ -19,8 +19,9 @@ class AddEntryForm(Widget):
     def __init__(self):
         super().__init__(layout=VLayout())
 
+        response = DatabaseMiddleware.get_table_names()
         self.table_name_combo_box = ComboBox(
-            items=database.get_tablenames().data, callback=self._set_inputs_by_table  # type: ignore
+            items=response.data, callback=self._set_inputs_by_table  # type: ignore
         )
         self.inputs_container = Widget(VLayout())
         self.submit_button = PushButton("Подтвердить", callback=self._request_entry_PUT)
@@ -33,13 +34,20 @@ class AddEntryForm(Widget):
         if not self.table_name_combo_box.get_value():
             return
 
-        response: DatabaseResponse = database.get_table_columns(
+        response = DatabaseMiddleware.get_columns_by_table_name(
             self.table_name_combo_box.get_value()
         )
 
         MessageFactory.show(response, True)
 
-        if got_columns(response):
+        if not response:
+            MessageFactory.show(
+                DatabaseResponse(
+                    status=ResponseStatus.ERROR,
+                    message="Нет ответа.",
+                ),
+            )
+        elif response.status == ResponseStatus.ERROR or not response.data:
             MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
@@ -47,7 +55,7 @@ class AddEntryForm(Widget):
                 ),
             )
             logger.error("Колонки не были получены", response.error)
-        elif response.data is None:
+        elif not response.data.values():
             MessageFactory.show(
                 DatabaseResponse(
                     status=ResponseStatus.ERROR,
@@ -98,8 +106,8 @@ class AddEntryForm(Widget):
 
                 data[label_text] = input.get_value()
 
-        table_name = self.table_name_combo_box.get_value()
-        insert_responce = database.insert_into_table(table_name, data)
+        table_name: str = self.table_name_combo_box.get_value()
+        insert_responce = DatabaseMiddleware.put_data(table_name, data)
         MessageFactory.show(insert_responce, True)
 
     def _clean(self) -> None:

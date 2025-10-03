@@ -1,3 +1,4 @@
+from typing import Any
 from backend.utils.responce_types import DatabaseResponse, ResponseStatus
 from frontend.shared.ui import PromptBox
 from PySide6.QtWidgets import QMessageBox
@@ -8,10 +9,13 @@ class MessageFactory:
 
     @staticmethod
     def show(
-        response: DatabaseResponse, is_modal: bool = False
+        response: DatabaseResponse | None, is_modal: bool = False
     ) -> bool:
         """Показывает сообщение в зависимости от статуса ответа и возвращает тип сообщения - модальное или нет"""
-        if response.status == ResponseStatus.ERROR:
+        if not response:
+            MessageFactory._show_error("Нет ответа")
+            return True
+        elif response.status == ResponseStatus.ERROR:
             MessageFactory._show_error(response)
             return True
         elif response.status == ResponseStatus.WARNING:
@@ -24,7 +28,7 @@ class MessageFactory:
             return False
 
     @staticmethod
-    def _show_error(response: DatabaseResponse) -> None:
+    def _show_error(response: Any) -> None:
         """Показывает сообщение об ошибке"""
         error_details = ""
         if response.error_details:
@@ -44,7 +48,7 @@ class MessageFactory:
         msg.exec()
 
     @staticmethod
-    def _show_warning(response: DatabaseResponse):
+    def _show_warning(response: Any):
         """Показывает предупреждение"""
         msg = PromptBox()
         msg.setIcon(PromptBox.Icon.Warning)
@@ -53,7 +57,7 @@ class MessageFactory:
         msg.exec()
 
     @staticmethod
-    def _show_success(response: DatabaseResponse):
+    def _show_success(response: Any):
         """Показывает сообщение об успехе (только для модальных окон)"""
         msg = PromptBox()
         msg.setIcon(PromptBox.Icon.Information)

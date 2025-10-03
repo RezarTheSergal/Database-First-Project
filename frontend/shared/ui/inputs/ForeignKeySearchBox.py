@@ -1,10 +1,15 @@
 from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QLineEdit
 from frontend.shared.ui.inputs import AutoComplete, ComboBox
-from backend.repository import DatabaseRepository
+from frontend.shared.utils import DatabaseMiddleware
+
 
 class ForeignKeySearchBox(ComboBox):
     """Pure UI component for foreign key search - handles only UI and search logic"""
+
+    target_table: str = ""
+    display_column: str = ""
+    id_column: str = ""
 
     # Add a signal for when selection changes
     selection_changed = Signal(object)
@@ -18,7 +23,6 @@ class ForeignKeySearchBox(ComboBox):
         # Extract foreign key info from column metadata
         self._extract_foreign_key_info()
         self.selected_id = None
-        self.repository = DatabaseRepository()
 
         self._setup_ui()
         self._setup_connections()
@@ -37,7 +41,7 @@ class ForeignKeySearchBox(ComboBox):
     def _setup_ui(self):
         """Setup UI components"""
         self.setLineEdit(QLineEdit())
-        self.lineEdit().setPlaceholderText("Поиск...") # type: ignore
+        self.lineEdit().setPlaceholderText("Поиск...")  # type: ignore
         self.setEditable(True)
         self.setInsertPolicy(ComboBox.InsertPolicy.NoInsert)
         self.setCompleter(AutoComplete())
@@ -57,44 +61,33 @@ class ForeignKeySearchBox(ComboBox):
 
     def _perform_search(self):
         """Perform search based on current text"""
-        text = self.currentText().strip()
-        if len(text) < 2:
+        query: str = self.currentText().strip()
+        if len(query) < 2:
             return
 
-        try:
-            results = self.repository.search_foreign_key(
-                table=self.target_table,
-                display_col=self.display_column,
-                id_col=self.id_column,
-                query=text,
-                limit=30,
-            )
-
-            if results.data:
-                self.blockSignals(True)
-                self.clear()
-                for item in results.data:
-                    display_text = str(item.get(self.display_column, ""))
-                    item_id = item.get(self.id_column)
-                    self.addItem(display_text, userData=item_id)
-                self.blockSignals(False)
-
-        except Exception as e:
-            print(f"Error fetching suggestions: {e}")
+        results = DatabaseMiddleware.search(
+            query, self.target_table, self.display_column, self.id_column
+        )
+        if results and results.data:
+            self.blockSignals(True)
+            self.clear()
+            for item in results.data:
+                display_text = str(item.get(self.display_column, ""))
+                item_id = item.get(self.id_column)
+                self.addItem(display_text, userData=item_id)
+            self.blockSignals(False)
+        else:
+            print(f"Error fetching suggestions: {results}")
             self.clear()
 
     def on_focus(self):
         """Load initial suggestions when focused"""
         try:
-            results = self.repository.search_foreign_key(
-                table=self.target_table,
-                display_col=self.display_column,
-                id_col=self.id_column,
-                query="",
-                limit=10,
+            results = DatabaseMiddleware.search_all(
+                self.target_table, self.display_column, self.id_column
             )
 
-            if results.data:
+            if results and results.data:
                 self.blockSignals(True)
                 self.clear()
                 for item in results.data:
@@ -142,14 +135,13 @@ class ForeignKeySearchBox(ComboBox):
             if not display_text:
                 # Fetch display text from database
                 try:
-                    response = self.repository.get_table_data(
-                        table_name=self.target_table,
-                        columns_list=[self.id_column, self.display_column],
-                        filters_dict={self.id_column: value_id},
-                        limit=1
+                    response = DatabaseMiddleware.search_single(
+                        self.target_table, self.display_column, self.id_column, value_id
                     )
-                    if response.data:
-                        display_text = str(response.data[0].get(self.display_column, value_id))
+                    if response and response.data:
+                        display_text = str(
+                            response.data[0].get(self.display_column, value_id)
+                        )
                     else:
                         display_text = str(value_id)
                 except Exception:

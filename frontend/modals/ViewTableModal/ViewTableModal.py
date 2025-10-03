@@ -1,5 +1,5 @@
 from .ui.TableControlPanel import TableControlPanel
-from frontend.shared.ui import Modal, Size, VLayout
+from frontend.shared.ui import Modal, Size
 
 
 class ViewTableModal(Modal):

@@ -5,7 +5,8 @@ from .lib.is_null import is_null
 class StringInput(QLineEdit):
     is_nullable: bool
 
-    def __init__(self,is_nullable:bool,max_input_length:int=256):
+    def __init__(self,is_nullable:bool=False,max_input_length:int=256):
+        super().__init__()
         self.is_nullable = is_nullable
         self.setMaxLength(max_input_length)
 

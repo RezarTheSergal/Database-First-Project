@@ -1,16 +1,17 @@
-from backend.repository import DatabaseRepository
 from backend.utils.responce_types import ResponseStatus
+from frontend.shared.utils import DatabaseMiddleware
 
 
 def populate_with_suggestions(foreign_key_search_box):
     if foreign_key_search_box.count() == 0:
-        resp = DatabaseRepository.search_foreign_key(
-            table=foreign_key_search_box.target_table,
-            display_col=foreign_key_search_box.display_column,
-            id_col=foreign_key_search_box.id_column,
-            query="",  # пустой запрос → можно вернуть первые N
-            limit=10,
+        resp = DatabaseMiddleware.search_all(
+            foreign_key_search_box.target_table,
+            foreign_key_search_box.display_column,
+            foreign_key_search_box.id_column,
         )
-        if resp.status == ResponseStatus.SUCCESS and resp.data is not None:
+
+        if resp and resp.status == ResponseStatus.SUCCESS and resp.data:
             for item in resp.data:
-                foreign_key_search_box.addItem(str(item["display"]), userData=item["id"])
+                foreign_key_search_box.addItem(
+                    str(item["display"]), userData=item["id"]
+                )
