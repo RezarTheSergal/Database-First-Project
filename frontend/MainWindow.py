@@ -62,8 +62,7 @@ class MainWindow(QMainWindow):
     # НЕ ПЕРЕИМЕНОВЫВАТЬ
     def closeEvent(self, event):
         """This method is automatically called when the window is about to close."""
-        reply = PromptBox().prompt(
-            self,
+        reply: int = PromptBox().prompt(
             "Подтвердить выход",
             "Вы точно хотите выйти из приложения? Любые несохраненные изменения будут утеряны.",
         )
